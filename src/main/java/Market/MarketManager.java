@@ -1,15 +1,14 @@
 package Market;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 public class MarketManager {
-    private ArrayList<User> users = new ArrayList<>();
-    private ArrayList<Provider> providers = new ArrayList<>();
-    private ArrayList<Commodity> commodities = new ArrayList<>();
+    private final ArrayList<User> users = new ArrayList<>();
+    private final ArrayList<Provider> providers = new ArrayList<>();
+    private final ArrayList<Commodity> commodities = new ArrayList<>();
 
     private static MarketManager marketManagerInstance = null;
 
@@ -23,60 +22,52 @@ public class MarketManager {
     }
 
 
-    ReturnObject addUser(String username, String password, String email, Date birthDay, String address, int credit) {
+    boolean addUser(String username, String password, String email, Date birthDay, String address, int credit) throws Exception {
         CharSequence[] invalidChars = {" ", "‌", "!", "@", "#", "$", "%", "^", "&", "*"};
         for (CharSequence invalidChar : invalidChars) {
             if (username.contains(invalidChar)) {
-                return new ReturnObject(false, "Invalid character in username");
+                throw new Exception("Invalid character in username");
             }
         }
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 user.updateUser(password, email, birthDay, address, credit);
-                return new ReturnObject(true, "User updated");
+                throw new Exception("User updated");
             }
         }
         User newUser = new User(username, password, email, birthDay, address, credit);
         users.add(newUser);
-        return new ReturnObject(true, "User created");
+        return true;
     }
 
-    ReturnObject addProvider(int id, String name, Date registryDate) {
+    boolean addProvider(int id, String name, Date registryDate) throws Exception {
         for (Provider provider : providers) {
             if (provider.getId() == id) {
-                return new ReturnObject(false, "This id is already registered");
+                throw  new Exception("This id is already registered");
             }
         }
         Provider newProvider = new Provider(id, name, registryDate);
         providers.add(newProvider);
-        return new ReturnObject(true, "Provider added");
+        return true;
     }
 
-    ReturnObject addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) {
+    boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws Exception {
         for (Provider provider : providers) {
             if (provider.getId() == providerId) {
                 for (Commodity commodity : commodities) {
                     if (commodity.getId() == id) {
-                        return new ReturnObject(false, "This id is already registered");
+                        throw new Exception("This id is already registered");
                     }
                 }
                 Commodity newCommodity = new Commodity(id, name, price, categories, rating, inStock);
                 commodities.add(newCommodity);
-                return new ReturnObject(true, "Commodity added");
+                return true;
             }
         }
-        return new ReturnObject(false, "Provider id not found");
+        throw new Exception("Provider id not found");
     }
 
-    ReturnObject getCommoditiesList() {
-        JSONObject obj = new JSONObject();
-        JSONArray arr = new JSONArray();
-        for (Commodity commodity : commodities) {
-            arr.add(commodity.toJsonObject());
-        }
-        obj.put("commoditiesList", arr);
-        return new ReturnObject(true, obj.toString());
+    List<Commodity> getCommoditiesList() {
+        return Collections.unmodifiableList(commodities);
     }
-
-
 }
