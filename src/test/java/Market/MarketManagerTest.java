@@ -11,39 +11,43 @@ import static org.junit.Assert.*;
 public class MarketManagerTest {
     @Test
     public void testAddUser() {
-        ReturnObject obj1 = MarketManager.addUser("mahdi", "xxxx", "pm@gmail.com", new Date(), "x", 0);
+        MarketManager mm = MarketManager.getInstance();
+        ReturnObject obj1 = mm.addUser("mahdi", "xxxx", "pm@gmail.com", new Date(), "x", 0);
         assertTrue(obj1.success());
-        ReturnObject obj2 = MarketManager.addUser("mahdi", "yyyy", "pm@gmail.com", new Date(), "x", 0);
+        ReturnObject obj2 = mm.addUser("mahdi", "yyyy", "pm@gmail.com", new Date(), "x", 0);
         assertTrue(obj2.success());
-        ReturnObject obj3 = MarketManager.addUser("mah@di", "yyyy", "pm@gmail.com", new Date(), "x", 0);
+        ReturnObject obj3 = mm.addUser("mah@di", "yyyy", "pm@gmail.com", new Date(), "x", 0);
         assertFalse(obj3.success());
     }
 
     @Test
     public void testAddProvider() {
-        ReturnObject obj1 = MarketManager.addProvider(1, "mahdi", new Date());
+        MarketManager mm = MarketManager.getInstance();
+        ReturnObject obj1 = mm.addProvider(1, "mahdi", new Date());
         assertTrue(obj1.success());
-        ReturnObject obj2 = MarketManager.addProvider(1, "mahdi", new Date());
+        ReturnObject obj2 = mm.addProvider(1, "mahdi", new Date());
         assertFalse(obj2.success());
-        ReturnObject obj3 = MarketManager.addProvider(2, "mahdi", new Date());
+        ReturnObject obj3 = mm.addProvider(2, "mahdi", new Date());
         assertTrue(obj3.success());
     }
 
     @Test
     public void testAddCommodity() {
-        ReturnObject obj1 = MarketManager.addCommodity(1, "mahdi", 3, 100, new ArrayList<Category>(), 8.2f, 10);
+        MarketManager mm = MarketManager.getInstance();
+        ReturnObject obj1 = mm.addCommodity(1, "mahdi", 3, 100, new ArrayList<Category>(), 8.2f, 10);
         assertFalse(obj1.success());
-        MarketManager.addProvider(3, "mahdi", new Date());
-        ReturnObject obj2 = MarketManager.addCommodity(1, "mahdi", 3, 100, new ArrayList<Category>(), 8.2f, 10);
+        mm.addProvider(3, "mahdi", new Date());
+        ReturnObject obj2 = mm.addCommodity(1, "mahdi", 3, 100, new ArrayList<Category>(), 8.2f, 10);
         assertTrue(obj2.success());
-        ReturnObject obj3 = MarketManager.addCommodity(1, "mahdi", 3, 100, new ArrayList<Category>(), 8.2f, 10);
+        ReturnObject obj3 = mm.addCommodity(1, "mahdi", 3, 100, new ArrayList<Category>(), 8.2f, 10);
         assertFalse(obj3.success());
     }
 
     @Test
     public void testGetCommoditiesList() {
-        MarketManager.addProvider(4, "mahdi", new Date());
-        ReturnObject obj1 = MarketManager.addCommodity(
+        MarketManager mm = MarketManager.getInstance();
+        mm.addProvider(4, "mahdi", new Date());
+        ReturnObject obj1 = mm.addCommodity(
                 4,
                 "mahdi",
                 4,
@@ -52,6 +56,6 @@ public class MarketManagerTest {
                 8.2f,
                 10);
         assertTrue(obj1.success());
-        System.out.println(MarketManager.getCommoditiesList());
+        System.out.println(mm.getCommoditiesList());
     }
 }

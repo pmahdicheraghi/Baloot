@@ -7,12 +7,23 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class MarketManager {
-    private static ArrayList<User> users = new ArrayList<>();
-    private static ArrayList<Provider> providers = new ArrayList<>();
+    private ArrayList<User> users = new ArrayList<>();
+    private ArrayList<Provider> providers = new ArrayList<>();
+    private ArrayList<Commodity> commodities = new ArrayList<>();
 
-    private static ArrayList<Commodity> commodities = new ArrayList<>();
+    private static MarketManager marketManagerInstance = null;
 
-    static ReturnObject addUser(String username, String password, String email, Date birthDay, String address, int credit) {
+    private MarketManager() {}
+
+    public static MarketManager getInstance() {
+        if (marketManagerInstance == null)
+            marketManagerInstance = new MarketManager();
+
+        return marketManagerInstance;
+    }
+
+
+    ReturnObject addUser(String username, String password, String email, Date birthDay, String address, int credit) {
         CharSequence[] invalidChars = {" ", "‌", "!", "@", "#", "$", "%", "^", "&", "*"};
         for (CharSequence invalidChar : invalidChars) {
             if (username.contains(invalidChar)) {
@@ -30,7 +41,7 @@ public class MarketManager {
         return new ReturnObject(true, "User created");
     }
 
-    static ReturnObject addProvider(int id, String name, Date registryDate) {
+    ReturnObject addProvider(int id, String name, Date registryDate) {
         for (Provider provider : providers) {
             if (provider.getId() == id) {
                 return new ReturnObject(false, "This id is already registered");
@@ -41,7 +52,7 @@ public class MarketManager {
         return new ReturnObject(true, "Provider added");
     }
 
-    static ReturnObject addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) {
+    ReturnObject addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) {
         for (Provider provider : providers) {
             if (provider.getId() == providerId) {
                 for (Commodity commodity : commodities) {
@@ -57,7 +68,7 @@ public class MarketManager {
         return new ReturnObject(false, "Provider id not found");
     }
 
-    static ReturnObject getCommoditiesList() {
+    ReturnObject getCommoditiesList() {
         JSONObject obj = new JSONObject();
         JSONArray arr = new JSONArray();
         for (Commodity commodity : commodities) {
