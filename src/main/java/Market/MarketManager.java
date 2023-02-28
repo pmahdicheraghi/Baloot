@@ -9,16 +9,37 @@ public class MarketManager {
     private final ArrayList<User> users = new ArrayList<>();
     private final ArrayList<Provider> providers = new ArrayList<>();
     private final ArrayList<Commodity> commodities = new ArrayList<>();
+    private final ArrayList<Rating> ratings = new ArrayList<>();
 
     private static MarketManager marketManagerInstance = null;
 
-    private MarketManager() {}
+    private MarketManager() {
+    }
 
     public static MarketManager getInstance() {
         if (marketManagerInstance == null)
             marketManagerInstance = new MarketManager();
 
         return marketManagerInstance;
+    }
+
+    private void updateCommodityScore(int commodityId) {
+        int sumRating = 0;
+        int numRating = 0;
+        for (Rating rating : ratings) {
+            if (rating.getCommodityId() == commodityId) {
+                sumRating += rating.getScore();
+                numRating++;
+            }
+        }
+        if (numRating != 0) {
+            for (Commodity commodity : commodities) {
+                if (commodity.getId() == commodityId) {
+                    commodity.updateRating(((float) sumRating) / numRating);
+                    return;
+                }
+            }
+        }
     }
 
 
@@ -32,22 +53,20 @@ public class MarketManager {
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 user.updateUser(password, email, birthDay, address, credit);
-                throw new Exception("User updated");
+                return true;
             }
         }
-        User newUser = new User(username, password, email, birthDay, address, credit);
-        users.add(newUser);
+        users.add(new User(username, password, email, birthDay, address, credit));
         return true;
     }
 
     boolean addProvider(int id, String name, Date registryDate) throws Exception {
         for (Provider provider : providers) {
             if (provider.getId() == id) {
-                throw  new Exception("This id is already registered");
+                throw new Exception("This id is already registered");
             }
         }
-        Provider newProvider = new Provider(id, name, registryDate);
-        providers.add(newProvider);
+        providers.add(new Provider(id, name, registryDate));
         return true;
     }
 
@@ -59,8 +78,7 @@ public class MarketManager {
                         throw new Exception("This id is already registered");
                     }
                 }
-                Commodity newCommodity = new Commodity(id, name, price, categories, rating, inStock);
-                commodities.add(newCommodity);
+                commodities.add(new Commodity(id, name, price, categories, rating, inStock));
                 return true;
             }
         }
@@ -69,5 +87,48 @@ public class MarketManager {
 
     List<Commodity> getCommoditiesList() {
         return Collections.unmodifiableList(commodities);
+    }
+
+    boolean rateCommodity(String username, int commodityId, int score) throws Exception {
+        if (score < 1 || score > 10) {
+            throw new Exception("Invalid score");
+        }
+        for (User user : users) {
+            if (user.getUsername() == username) {
+                for (Commodity commodity : commodities) {
+                    if (commodity.getId() == commodityId) {
+                        for (Rating rating : ratings) {
+                            if (rating.getCommodityId() == commodityId && rating.getUsername() == username) {
+                                rating.updateScore(score);
+                                updateCommodityScore(commodityId);
+                                return true;
+                            }
+                        }
+                        ratings.add(new Rating(username, commodityId, score));
+                        updateCommodityScore(commodityId);
+                        return true;
+                    }
+                }
+                throw new Exception("Commodity not found");
+            }
+        }
+        throw new Exception("User not found");
+    }
+
+    boolean addToBuyList(String username, int commodityId) throws Exception {
+        for (User user : users) {
+            if (user.getUsername() == username) {
+                for (Commodity commodity : commodities) {
+                    if (commodity.getId() == commodityId) {
+                        if (commodity.getInStock() > 0) {
+                            user.addToBuyList(commodityId);
+                        }
+                        throw new Exception("Out of stoke");
+                    }
+                }
+                throw new Exception("Commodity not found");
+            }
+        }
+        throw new Exception("User not found");
     }
 }

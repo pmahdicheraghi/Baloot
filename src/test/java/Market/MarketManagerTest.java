@@ -15,9 +15,9 @@ public class MarketManagerTest {
             boolean r1 = mm.addUser("mahdi", "x", "pm@gmail.com", new Date(), "y", 10);
             assertTrue(r1);
             boolean r2 = mm.addUser("mahdi", "y", "pmgh@gmail.com", new Date(), "x", 0);
-            assertFalse(r2);
+            assertTrue(r2);
         } catch (Exception e) {
-            assertTrue(true);
+            fail();
         }
     }
 
