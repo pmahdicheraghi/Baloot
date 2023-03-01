@@ -21,9 +21,6 @@ public class CommandLine {
                 inputCommand = scanner.nextLine();
                 String command;
                 String json;
-                String username;
-                int commodityId;
-                int id;
                 if (inputCommand.contains(" ")) {
                     int spaceIndex = inputCommand.indexOf(" ");
                     command = inputCommand.substring(0, spaceIndex);
@@ -35,7 +32,7 @@ public class CommandLine {
                 JSONObject params = JsonParser.parseJson(json);
                 switch (command) {
                     case "addUser": {
-                        username = (String) params.get("username");
+                        String username = (String) params.get("username");
                         String password = (String) params.get("password");
                         String email = (String) params.get("email");
                         Date birthDate = dateFormat.parse((String) params.get("birthDate"));
@@ -46,7 +43,7 @@ public class CommandLine {
                         break;
                     }
                     case "addProvider": {
-                        id = (int) (long) params.get("id");
+                        int id = (int) (long) params.get("id");
                         String name = (String) params.get("name");
                         Date registryDate = dateFormat.parse((String) params.get("registryDate"));
                         market.addProvider(id, name, registryDate);
@@ -54,7 +51,7 @@ public class CommandLine {
                         break;
                     }
                     case "addCommodity": {
-                        id = (int) (long) params.get("id");
+                        int id = (int) (long) params.get("id");
                         String name = (String) params.get("name");
                         int providerId = (int) (long) params.get("providerId");
                         int price = (int) (long) params.get("price");
@@ -73,56 +70,59 @@ public class CommandLine {
                         }
                         JSONObject result = new JSONObject();
                         result.put("commoditiesList", commoditiesJson);
-                        System.out.printf(toResultJson(true, result.toJSONString()));
+                        System.out.println(toResultJson(true, result));
                         break;
                     }
                     case "rateCommodity": {
-                        username = (String) params.get("username");
-                        commodityId = (int) (long) params.get("commodityId");
+                        String username = (String) params.get("username");
+                        int commodityId = (int) (long) params.get("commodityId");
                         int score = (int) (long) params.get("score");
                         market.rateCommodity(username, commodityId, score);
-                        System.out.printf(toResultJson(true, "Commodity rated successfully."));
+                        System.out.println(toResultJson(true, "Commodity rated successfully"));
                         break;
                     }
                     case "addToBuyList": {
-                        username =(String) params.get("username");
-                        commodityId = (int) (long) params.get("commodityId");
-                        market.addToBuyList(username,commodityId);
-                        System.out.printf(toResultJson(true, "Commodity added to buy list successfully."));
+                        String username = (String) params.get("username");
+                        int commodityId = (int) (long) params.get("commodityId");
+                        market.addToBuyList(username, commodityId);
+                        System.out.println(toResultJson(true, "Commodity added to buy list successfully"));
+                        break;
                     }
-                    case "removeFromBuyList":{
-                        username = (String) params.get("username");
-                        commodityId=(int)(long) params.get("commodityId");
-                        market.removeFromBuyList(username,commodityId);
-                        System.out.printf(toResultJson(true, "Commodity removed from buy list successfully."));
+                    case "removeFromBuyList": {
+                        String username = (String) params.get("username");
+                        int commodityId = (int) (long) params.get("commodityId");
+                        market.removeFromBuyList(username, commodityId);
+                        System.out.println(toResultJson(true, "Commodity removed from buy list successfully"));
+                        break;
                     }
-                    case "getCommodityById":{
-                        id= (int)(long) params.get("id");
+                    case "getCommodityById": {
+                        int id = (int) (long) params.get("id");
                         JSONObject commodity = market.getCommodityById(id).toJsonObject(false);
-                        System.out.printf(toResultJson(true, commodity.toJSONString()));
+                        System.out.println(toResultJson(true, commodity));
+                        break;
                     }
                     case "getCommoditiesByCategory": {
                         Category category = Category.valueOf((String) params.get("category"));
-                        List <Commodity> commodities = market.getCommoditiesByCategory(category);
+                        List<Commodity> commodities = market.getCommoditiesByCategory(category);
                         JSONArray commoditiesJson = new JSONArray();
                         for (Commodity commodity : commodities) {
                             commoditiesJson.add(commodity.toJsonObject(false));
                         }
                         JSONObject result = new JSONObject();
                         result.put("commoditiesListByCategory", commoditiesJson);
-                        System.out.printf(toResultJson(true, result.toJSONString()));
+                        System.out.println(toResultJson(true, result));
                         break;
                     }
-                    case "getBuyList":{
-                        username = (String) params.get("username");
-                        List <Commodity> commodities = market.getBuyList(username);
+                    case "getBuyList": {
+                        String username = (String) params.get("username");
+                        List<Commodity> commodities = market.getBuyList(username);
                         JSONArray commoditiesJson = new JSONArray();
                         for (Commodity commodity : commodities) {
                             commoditiesJson.add(commodity.toJsonObject(false));
                         }
                         JSONObject result = new JSONObject();
                         result.put("buyList", commoditiesJson);
-                        System.out.printf(toResultJson(true, result.toJSONString()));
+                        System.out.println(toResultJson(true, result));
                         break;
                     }
                     case "exit":
@@ -131,12 +131,15 @@ public class CommandLine {
                         throw new Exception("Invalid command: " + command);
                 }
             } catch (Exception e) {
-                System.out.printf(toResultJson(false, e.getMessage()));
+                System.out.println(toResultJson(false, e.getMessage()));
             }
         } while (true);
     }
 
     public static String toResultJson(boolean success, String data) {
         return "{\"success\": %s, \"data\": \"%s\"}".formatted(success, data);
+    }
+    public static String toResultJson(boolean success, JSONObject data) {
+        return "{\"success\": %s, \"data\": %s}".formatted(success, data.toJSONString());
     }
 }
