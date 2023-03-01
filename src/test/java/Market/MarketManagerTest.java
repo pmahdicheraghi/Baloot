@@ -3,7 +3,9 @@ package Market;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -72,4 +74,69 @@ public class MarketManagerTest {
             fail();
         }
     }
+
+    @Test
+    public void testRateCommodity() {
+        MarketManager mm = MarketManager.getInstance();
+        try {
+            mm.addUser("mohsen", "x", "pmch@gmail.com", new Date(), "x", 2);
+            mm.addProvider(5, "mm", new Date());
+            mm.addCommodity(3, "dd", 5, 120, new ArrayList<>(), 2.2f, 4);
+            mm.rateCommodity("mohsen", 5, 4);
+            assertEquals(4f, mm.getCommodityById(3).getRating());
+            boolean r1 = mm.rateCommodity("mohsen", 3, 12);
+            assertFalse(r1);
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testAddToBuyListAndRemove() {
+        MarketManager mm = MarketManager.getInstance();
+        try {
+            boolean r1 = mm.addToBuyList("god", 3);
+            assertFalse(r1);
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+
+        try {
+            mm.addUser("hesam", "x", "pmch@gmail.com", new Date(), "x", 2);
+            mm.addProvider(6, "mm", new Date());
+            mm.addCommodity(4, "dd", 6, 120, new ArrayList<>(), 2.2f, 4);
+            boolean r1 = mm.addToBuyList("hesam", 4);
+            assertTrue(r1);
+            boolean r2 = mm.removeFromBuyList("hesam", 4);
+            assertTrue(r2);
+            List<Commodity> cs = mm.getBuyList("hesam");
+            assertEquals(0, cs.size());
+        } catch (Exception e) {
+            fail();
+        }
+
+        try {
+            boolean r1 = mm.removeFromBuyList("hesam", 4);
+            assertFalse(r1);
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testGetCommodity() {
+        MarketManager mm = MarketManager.getInstance();
+        try {
+            mm.addUser("gholam", "xyz", "pmch@gmail.com", new Date(), "xyz", 2);
+            mm.addProvider(7, "mm", new Date());
+            mm.addCommodity(5, "C5", 7, 120, new ArrayList<>(Arrays.asList(Category.Technology, Category.Vegetables)), 2.2f, 4);
+            Commodity c5 = mm.getCommodityById(5);
+            assertEquals("C5", c5.getName());
+            List<Commodity> cs = mm.getCommoditiesByCategory(Category.Vegetables);
+            assertNotEquals(0, cs.size());
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
 }
