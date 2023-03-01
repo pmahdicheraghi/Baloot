@@ -1,8 +1,8 @@
 package Market;
 
 public class Rating {
-    private String username;
-    private int commodityId;
+    private final String username;
+    private final int commodityId;
     private int score;
 
     public Rating(String username, int commodityId, int score) {

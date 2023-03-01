@@ -1,14 +1,16 @@
 package Market;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Commodity {
-    private int id;
-    private String name;
-    private int price;
+    private final int id;
+    private final String name;
+    private final int price;
     private float rating;
-    private int inStock;
-    private ArrayList<Category> categories;
+    private final int inStock;
+    private final ArrayList<Category> categories;
 
     public Commodity(int id, String name, int price, ArrayList<Category> categories, float rating, int inStock) {
         this.id = id;
@@ -29,6 +31,22 @@ public class Commodity {
 
     public void updateRating(float rating) {
         this.rating = rating;
+    }
+
+    public List<Category> getCategories() {
+        return Collections.unmodifiableList(categories);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public float getRating() {
+        return rating;
     }
 
 

@@ -11,8 +11,7 @@ public class JsonParser {
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(s);
-            JSONObject jsObj = (JSONObject) obj;
-            return jsObj;
+            return (JSONObject) obj;
         } catch (ParseException pe) {
             System.out.println(pe);
         }
