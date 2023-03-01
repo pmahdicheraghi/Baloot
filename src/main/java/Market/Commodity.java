@@ -1,5 +1,7 @@
 package Market;
 
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,16 +51,15 @@ public class Commodity {
         return rating;
     }
 
-
-//    public JSONObject toJsonObject() {
-//        JSONObject obj = new JSONObject();
-//        obj.put("id", id);
-//        obj.put("name", name);
-//        obj.put("price", price);
-//        obj.put("categories", categories.toString());
-//        obj.put("rating", rating);
-//        obj.put("inStock", inStock);
-//        return obj;
-//    }
+    public JSONObject toJsonObject(boolean withInStock) {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("price", price);
+        obj.put("categories", categories.toString());
+        obj.put("rating", rating);
+        if (withInStock) obj.put("inStock", inStock);
+        return obj;
+    }
 
 }
