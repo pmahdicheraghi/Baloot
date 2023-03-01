@@ -3,9 +3,9 @@ package Market;
 import java.util.Date;
 
 public class Provider {
-    private int id;
-    private String name;
-    private Date registryDate;
+    private final int id;
+    private final String name;
+    private final Date registryDate;
 
     public Provider(int id, String name, Date registryDate) {
         this.id = id;
@@ -15,5 +15,13 @@ public class Provider {
 
     public int getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Date getRegistryDate() {
+        return registryDate;
     }
 }

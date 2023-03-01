@@ -1,14 +1,18 @@
 package Market;
 
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Commodity {
-    private int id;
-    private String name;
-    private int price;
+    private final int id;
+    private final String name;
+    private final int price;
     private float rating;
-    private int inStock;
-    private ArrayList<Category> categories;
+    private final int inStock;
+    private final ArrayList<Category> categories;
 
     public Commodity(int id, String name, int price, ArrayList<Category> categories, float rating, int inStock) {
         this.id = id;
@@ -31,16 +35,31 @@ public class Commodity {
         this.rating = rating;
     }
 
+    public List<Category> getCategories() {
+        return Collections.unmodifiableList(categories);
+    }
 
-//    public JSONObject toJsonObject() {
-//        JSONObject obj = new JSONObject();
-//        obj.put("id", id);
-//        obj.put("name", name);
-//        obj.put("price", price);
-//        obj.put("categories", categories.toString());
-//        obj.put("rating", rating);
-//        obj.put("inStock", inStock);
-//        return obj;
-//    }
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public JSONObject toJsonObject(boolean withInStock) {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("price", price);
+        obj.put("categories", categories.toString());
+        obj.put("rating", rating);
+        if (withInStock) obj.put("inStock", inStock);
+        return obj;
+    }
 
 }

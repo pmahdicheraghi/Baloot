@@ -1,9 +1,6 @@
 package Market;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class MarketManager {
     private final ArrayList<User> users = new ArrayList<>();
@@ -42,6 +39,32 @@ public class MarketManager {
         }
     }
 
+    private User getUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private Provider getProviderById(int id) {
+        for (Provider provider : providers) {
+            if (provider.getId() == id) {
+                return provider;
+            }
+        }
+        return null;
+    }
+
+    private Commodity findCommodityById(int id) {
+        for (Commodity commodity : commodities) {
+            if (commodity.getId() == id) {
+                return commodity;
+            }
+        }
+        return null;
+    }
 
     boolean addUser(String username, String password, String email, Date birthDay, String address, int credit) throws Exception {
         CharSequence[] invalidChars = {" ", "‌", "!", "@", "#", "$", "%", "^", "&", "*"};
@@ -50,39 +73,35 @@ public class MarketManager {
                 throw new Exception("Invalid character in username");
             }
         }
-        for (User user : users) {
-            if (user.getUsername().equals(username)) {
-                user.updateUser(password, email, birthDay, address, credit);
-                return true;
-            }
+        User user = getUserByUsername(username);
+        if (user == null) {
+            users.add(new User(username, password, email, birthDay, address, credit));
+            return true;
         }
-        users.add(new User(username, password, email, birthDay, address, credit));
+        user.updateUser(password, email, birthDay, address, credit);
         return true;
     }
 
     boolean addProvider(int id, String name, Date registryDate) throws Exception {
-        for (Provider provider : providers) {
-            if (provider.getId() == id) {
-                throw new Exception("This id is already registered");
-            }
+        Provider provider = getProviderById(id);
+        if (provider != null) {
+            throw new Exception("This id is already registered");
         }
         providers.add(new Provider(id, name, registryDate));
         return true;
     }
 
     boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws Exception {
-        for (Provider provider : providers) {
-            if (provider.getId() == providerId) {
-                for (Commodity commodity : commodities) {
-                    if (commodity.getId() == id) {
-                        throw new Exception("This id is already registered");
-                    }
-                }
-                commodities.add(new Commodity(id, name, price, categories, rating, inStock));
-                return true;
-            }
+        Provider provider = getProviderById(providerId);
+        if (provider == null) {
+            throw new Exception("Provider id not found");
         }
-        throw new Exception("Provider id not found");
+        Commodity commodity = findCommodityById(id);
+        if (commodity != null) {
+            throw new Exception("This id is already registered");
+        }
+        commodities.add(new Commodity(id, name, price, categories, rating, inStock));
+        return true;
     }
 
     List<Commodity> getCommoditiesList() {
@@ -93,42 +112,86 @@ public class MarketManager {
         if (score < 1 || score > 10) {
             throw new Exception("Invalid score");
         }
-        for (User user : users) {
-            if (user.getUsername() == username) {
-                for (Commodity commodity : commodities) {
-                    if (commodity.getId() == commodityId) {
-                        for (Rating rating : ratings) {
-                            if (rating.getCommodityId() == commodityId && rating.getUsername() == username) {
-                                rating.updateScore(score);
-                                updateCommodityScore(commodityId);
-                                return true;
-                            }
-                        }
-                        ratings.add(new Rating(username, commodityId, score));
-                        updateCommodityScore(commodityId);
-                        return true;
-                    }
-                }
-                throw new Exception("Commodity not found");
+        User user = getUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        Commodity commodity = findCommodityById(commodityId);
+        if (commodity == null) {
+            throw new Exception("Commodity not found");
+        }
+        for (Rating rating : ratings) {
+            if (rating.getCommodityId() == commodityId && rating.getUsername().equals(username)) {
+                rating.updateScore(score);
+                updateCommodityScore(commodityId);
+                return true;
             }
         }
-        throw new Exception("User not found");
+        ratings.add(new Rating(username, commodityId, score));
+        updateCommodityScore(commodityId);
+        return true;
     }
 
+
     boolean addToBuyList(String username, int commodityId) throws Exception {
-        for (User user : users) {
-            if (user.getUsername() == username) {
-                for (Commodity commodity : commodities) {
-                    if (commodity.getId() == commodityId) {
-                        if (commodity.getInStock() > 0) {
-                            user.addToBuyList(commodityId);
-                        }
-                        throw new Exception("Out of stoke");
-                    }
-                }
-                throw new Exception("Commodity not found");
+        User user = getUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        Commodity commodity = findCommodityById(commodityId);
+        if (commodity == null) {
+            throw new Exception("Commodity not found");
+        }
+        if (commodity.getInStock() <= 0) {
+            throw new Exception("Out of stoke");
+        }
+        user.addToBuyList(commodityId);
+        return true;
+    }
+
+
+    boolean removeFromBuyList(String username, int commodityId) throws Exception {
+        User user = getUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        Commodity commodity = findCommodityById(commodityId);
+        if (commodity == null) {
+            throw new Exception("Commodity not found");
+        }
+        user.removeFromBuyList(commodityId);
+        return true;
+    }
+
+     Commodity getCommodityById(int id) throws Exception {
+        Commodity commodity = findCommodityById(id);
+        if (commodity == null) {
+            throw new Exception("Commodity not found");
+        }
+        return commodity;
+     }
+
+    List<Commodity> getCommoditiesByCategory(Category category) {
+        List<Commodity> temp = new ArrayList<>();
+        for (Commodity commodity : commodities) {
+            if (commodity.getCategories().contains(category)) {
+                temp.add(commodity);
             }
         }
-        throw new Exception("User not found");
+        return temp;
     }
+
+    List<Commodity> getBuyList(String username) throws Exception {
+        User user = getUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        List<Integer> buyList = user.getBuyList();
+        ArrayList<Commodity> commodityArrayList = new ArrayList<>();
+        for (int buyItem : buyList) {
+            commodityArrayList.add(getCommodityById(buyItem));
+        }
+        return Collections.unmodifiableList(commodityArrayList);
+    }
+
 }
