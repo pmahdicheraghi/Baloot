@@ -66,7 +66,7 @@ public class MarketManager {
         return null;
     }
 
-    boolean addUser(String username, String password, String email, Date birthDay, String address, int credit) throws Exception {
+    public boolean addUser(String username, String password, String email, Date birthDay, String address, int credit) throws Exception {
         CharSequence[] invalidChars = {" ", "‌", "!", "@", "#", "$", "%", "^", "&", "*"};
         for (CharSequence invalidChar : invalidChars) {
             if (username.contains(invalidChar)) {
@@ -82,7 +82,7 @@ public class MarketManager {
         return true;
     }
 
-    boolean addProvider(int id, String name, Date registryDate) throws Exception {
+    public boolean addProvider(int id, String name, Date registryDate) throws Exception {
         Provider provider = getProviderById(id);
         if (provider != null) {
             throw new Exception("This id is already registered");
@@ -91,7 +91,7 @@ public class MarketManager {
         return true;
     }
 
-    boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws Exception {
+    public boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws Exception {
         Provider provider = getProviderById(providerId);
         if (provider == null) {
             throw new Exception("Provider id not found");
@@ -104,11 +104,11 @@ public class MarketManager {
         return true;
     }
 
-    List<Commodity> getCommoditiesList() {
+    public List<Commodity> getCommoditiesList() {
         return Collections.unmodifiableList(commodities);
     }
 
-    boolean rateCommodity(String username, int commodityId, int score) throws Exception {
+    public boolean rateCommodity(String username, int commodityId, int score) throws Exception {
         if (score < 1 || score > 10) {
             throw new Exception("Invalid score");
         }
@@ -133,7 +133,7 @@ public class MarketManager {
     }
 
 
-    boolean addToBuyList(String username, int commodityId) throws Exception {
+    public boolean addToBuyList(String username, int commodityId) throws Exception {
         User user = getUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
@@ -150,7 +150,7 @@ public class MarketManager {
     }
 
 
-    boolean removeFromBuyList(String username, int commodityId) throws Exception {
+    public boolean removeFromBuyList(String username, int commodityId) throws Exception {
         User user = getUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
@@ -163,7 +163,7 @@ public class MarketManager {
         return true;
     }
 
-     Commodity getCommodityById(int id) throws Exception {
+    public Commodity getCommodityById(int id) throws Exception {
         Commodity commodity = findCommodityById(id);
         if (commodity == null) {
             throw new Exception("Commodity not found");
@@ -171,7 +171,7 @@ public class MarketManager {
         return commodity;
      }
 
-    List<Commodity> getCommoditiesByCategory(Category category) {
+    public List<Commodity> getCommoditiesByCategory(Category category) {
         List<Commodity> temp = new ArrayList<>();
         for (Commodity commodity : commodities) {
             if (commodity.getCategories().contains(category)) {
@@ -181,7 +181,7 @@ public class MarketManager {
         return temp;
     }
 
-    List<Commodity> getBuyList(String username) throws Exception {
+    public List<Commodity> getBuyList(String username) throws Exception {
         User user = getUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
