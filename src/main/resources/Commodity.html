@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Commodity</title>
+    <style>
+      li {
+        padding: 5px;
+      }
+      table {
+        width: 50%;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+   
+    <ul>
+      <li id="id">Id: 2341</li>
+      <li id="name">Name: Galaxy S21</li>
+      <li id="providerId">Provider Id: 1781</li>
+      <li id="price">Price: 21000000</li>
+      <li id="categories">Categories: Technology, Phone</li>
+      <li id="rating">Rating: 8.3</li>
+      <li id="inStock">In Stock: 17</li>
+    </ul>
+
+    <label>Your ID:</label>
+    <input type="text" name="user_id" value="" />
+    <br><br>
+    <form action="" method="POST">
+      <label>Rate(between 1 and 10):</label>
+      <input type="number" id="quantity" name="quantity" min="1" max="10">
+      <button type="submit">Rate</button>
+    </form>
+    <br>
+    <form action="" method="POST">
+      <button type="submit">Add to BuyList</button>
+    </form>
+    <br />
+
+    <table>
+      <tr>
+        <th>username</th>
+        <th>comment</th>
+        <th>date</th>
+        <th></th>
+        <th></th>
+      </tr>
+      <tr>
+        <td>user1</td>
+        <td>Good</td>
+        <td>2022-07-25</td>
+        <td>
+          <form action="" method="POST">
+            <label for="form_comment_id_1">2</label>
+            <input
+              id="form_comment_id_1"
+              type="hidden"
+              name="comment_id"
+              value="01"
+            />
+            <button type="submit">like</button>
+          </form>
+        </td>
+        <td>
+          <form action="" method="POST">
+            <label for="form_comment_id_2">1</label>
+            <input
+              id="form_comment_id_2"
+              type="hidden"
+              name="comment_id"
+              value="01"
+            />
+            <button type="submit">dislike</button>
+          </form>
+        </td>
+      </tr>
+    </table>
+   
+  </body>
+</html>
