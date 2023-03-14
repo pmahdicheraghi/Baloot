@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class Server {
@@ -13,9 +14,7 @@ public class Server {
         MarketManager mm = MarketManager.getInstance();
         mm.init();
 
-        Javalin app = Javalin.create(config -> {
-            config.staticFiles.add("/public", Location.CLASSPATH);
-        }).start(7070);
+        Javalin app = Javalin.create(config -> config.staticFiles.add("/public", Location.CLASSPATH)).start(7070);
 
         app.get("commodities", ctx -> {
             List<Commodity> commoditiesList = mm.getCommoditiesList();
@@ -200,5 +199,28 @@ public class Server {
             ctx.redirect("/users/" + username);
         });
 
+        app.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
+            File errorFile = new File("src/main/resources/403.html");
+            Document doc;
+            try {
+                doc = Jsoup.parse(errorFile, "UTF-8", "http://http://localhost:7070/");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            doc.getElementById("message").html("Error: " + e.getMessage());
+            ctx.html(doc.html());
+        });
+
+        app.error(404, ctx -> {
+            File errorFile = new File("src/main/resources/404.html");
+            Document doc;
+            try {
+                doc = Jsoup.parse(errorFile, "UTF-8", "http://http://localhost:7070/");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            ctx.html(doc.html());
+        });
     }
 }
