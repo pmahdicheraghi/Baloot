@@ -36,6 +36,47 @@ public class Server {
             ctx.html(doc.html());
         });
 
+        app.get("/commodities/search/{categories}", ctx -> {
+            String categories = ctx.pathParam("categories");
+            List<Commodity> commoditiesList = mm.getCommoditiesByCategory(Category.get(categories));
+            File commoditiesFile = new File("src/main/resources/Commodities.html");
+            Document doc = Jsoup.parse(commoditiesFile, "UTF-8", "http://http://localhost:7070/");
+            for (Commodity commodity : commoditiesList) {
+                doc.getElementById("tableID").append("<tr>" +
+                        "<td>" + commodity.getId() + "</td>\n" +
+                        "<td>" + commodity.getName() + "</td> \n" +
+                        "<td>" + commodity.getProviderId() + "</td>\n" +
+                        "<td>" + commodity.getPrice() + "</td>\n" +
+                        "<td>" + commodity.getCategories() + "</td>\n" +
+                        "<td>" + commodity.getRating() + "</td>\n" +
+                        "<td>" + commodity.getInStock() + "</td>\n" +
+                        "<td><a href=\"/commodities/" + commodity.getId() + "\">Link</a></td>" +
+                        "</tr>");
+            }
+            ctx.html(doc.html());
+        });
+
+        app.get("/commodities/search/{start_price}/{end_price}", ctx -> {
+            int startPrice = Integer.parseInt(ctx.pathParam("start_price"));
+            int endPrice = Integer.parseInt(ctx.pathParam("end_price"));
+            List<Commodity> commoditiesList = mm.getCommoditiesWithinPrice(startPrice, endPrice);
+            File commoditiesFile = new File("src/main/resources/Commodities.html");
+            Document doc = Jsoup.parse(commoditiesFile, "UTF-8", "http://http://localhost:7070/");
+            for (Commodity commodity : commoditiesList) {
+                doc.getElementById("tableID").append("<tr>" +
+                        "<td>" + commodity.getId() + "</td>\n" +
+                        "<td>" + commodity.getName() + "</td> \n" +
+                        "<td>" + commodity.getProviderId() + "</td>\n" +
+                        "<td>" + commodity.getPrice() + "</td>\n" +
+                        "<td>" + commodity.getCategories() + "</td>\n" +
+                        "<td>" + commodity.getRating() + "</td>\n" +
+                        "<td>" + commodity.getInStock() + "</td>\n" +
+                        "<td><a href=\"/commodities/" + commodity.getId() + "\">Link</a></td>" +
+                        "</tr>");
+            }
+            ctx.html(doc.html());
+        });
+
         app.get("/commodities/{commodity_id}", ctx -> {
             int commodityId = Integer.parseInt(ctx.pathParam("commodity_id"));
             Commodity commodity = mm.getCommodityById(commodityId);
@@ -48,6 +89,10 @@ public class Server {
             doc.getElementById("categories").html("Category: " + commodity.getCategories());
             doc.getElementById("rating").html("Rating: " + commodity.getRating());
             doc.getElementById("inStock").html("In Stock: " + commodity.getInStock());
+            doc.getElementById("addToBuyList").attr("onClick",
+                    "window.location.href = '/addToBuyList/' + document.getElementById('user_id').value + '/" + commodity.getId() + "'");
+            doc.getElementById("rateCommodity").attr("onClick",
+                    "window.location.href = '/rateCommodity/' + document.getElementById('user_id').value + '/" + commodity.getId() + "/' + document.getElementById('quantity').value");
             // TODO: add comments
             ctx.html(doc.html());
         });
@@ -87,6 +132,9 @@ public class Server {
             doc.getElementById("birthDate").html("Birth Date: " + user.getBirthDay());
             doc.getElementById("address").html("Address: " + user.getAddress());
             doc.getElementById("credit").html("Credit: " + user.getCredit());
+
+            doc.getElementById("purchase").attr("onClick", "window.location.href = '/purchase/" + user.getUsername() + "'");
+
             List<Commodity> buyList = mm.getBuyList(user_id);
             for (Commodity commodity : buyList) {
                 doc.getElementById("buyList").append("<tr>" +
@@ -106,6 +154,7 @@ public class Server {
                 doc.getElementById("purchasedList").append("<tr>" +
                         "<td>" + commodity.getId() + "</td>\n" +
                         "<td>" + commodity.getName() + "</td> \n" +
+                        "<td>" + commodity.getProviderId() + "</td> \n" +
                         "<td>" + commodity.getPrice() + "</td>\n" +
                         "<td>" + commodity.getCategories() + "</td>\n" +
                         "<td>" + commodity.getRating() + "</td>\n" +
@@ -122,5 +171,34 @@ public class Server {
             mm.addCreditToUser(user_id, credit);
             ctx.redirect("/users/" + user_id);
         });
+
+        app.get("/addToBuyList/{username}/{commodityId}", ctx -> {
+            String username = ctx.pathParam("username");
+            int commodityId = Integer.parseInt(ctx.pathParam("commodityId"));
+            mm.addToBuyList(username, commodityId);
+            ctx.redirect("/users/" + username);
+        });
+
+        app.get("/removeFromBuyList/{username}/{commodityId}", ctx -> {
+            String username = ctx.pathParam("username");
+            int commodityId = Integer.parseInt(ctx.pathParam("commodityId"));
+            mm.removeFromBuyList(username, commodityId);
+            ctx.redirect("/users/" + username);
+        });
+
+        app.get("/rateCommodity/{username}/{commodityId}/{rate}", ctx -> {
+            String username = ctx.pathParam("username");
+            int commodityId = Integer.parseInt(ctx.pathParam("commodityId"));
+            int rate = Integer.parseInt(ctx.pathParam("rate"));
+            mm.rateCommodity(username, commodityId, rate);
+            ctx.redirect("/commodities/" + commodityId);
+        });
+
+        app.get("/purchase/{username}/", ctx -> {
+            String username = ctx.pathParam("username");
+            mm.purchase(username);
+            ctx.redirect("/users/" + username);
+        });
+
     }
 }

@@ -246,6 +246,16 @@ public class MarketManager {
         return temp;
     }
 
+    public List<Commodity> getCommoditiesWithinPrice(int startPrice, int endPrice) {
+        List<Commodity> temp = new ArrayList<>();
+        for (Commodity commodity : commodities) {
+            if (commodity.getPrice() >= startPrice && commodity.getPrice() <= endPrice) {
+                temp.add(commodity);
+            }
+        }
+        return temp;
+    }
+
     public List<Commodity> getBuyList(String username) throws Exception {
         User user = findUserByUsername(username);
         if (user == null) {
@@ -270,6 +280,26 @@ public class MarketManager {
             commodityArrayList.add(getCommodityById(buyItem));
         }
         return Collections.unmodifiableList(commodityArrayList);
+    }
+
+    public boolean purchase(String username) throws Exception {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        List<Commodity> buyList = getBuyList(username);
+        int totalPrice = 0;
+        for (Commodity commodity : buyList) {
+            totalPrice += commodity.getPrice();
+        }
+        for (Commodity commodity : buyList) {
+            if (commodity.getInStock() <= 0) {
+                throw new Exception("Out of stoke");
+            }
+            commodity.buy();
+        }
+        user.purchase(totalPrice);
+        return true;
     }
 
     public void addCreditToUser(String username, int credit) throws Exception {

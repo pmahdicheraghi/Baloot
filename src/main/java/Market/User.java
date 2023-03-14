@@ -33,23 +33,16 @@ class User {
         this.credit = credit;
     }
 
-    public void purchaseCommodity(int commodityId) throws Exception {
-        for (int buyListCommodityId : buyList) {
-            if (buyListCommodityId == commodityId) {
-                Commodity commodity = MarketManager.getInstance().getCommodityById(commodityId);
-                if (commodity.getPrice() > credit) {
-                    throw new Exception("Not enough credit to buy");
-                }
-                if (commodity.getInStock() <= 0) {
-                    throw new Exception("Out of stock");
-                }
-                buyList.remove(Integer.valueOf(commodityId));
-                purchasedList.add(commodityId);
-                credit -= commodity.getPrice();
-                commodity.buy();
-            }
+    public void purchase(int price) throws Exception {
+        if (buyList.size() == 0) {
+            throw new Exception("Buy list is empty");
         }
-        throw new Exception("First add item fo buyList");
+        if (credit < price) {
+            throw new Exception("Not enough credit");
+        }
+        credit -= price;
+        purchasedList.addAll(buyList);
+        buyList.clear();
     }
 
     public void addToBuyList(int commodityId) throws Exception {
