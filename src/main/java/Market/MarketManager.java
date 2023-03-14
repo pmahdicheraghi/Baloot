@@ -1,6 +1,13 @@
 package Market;
 
-import java.util.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class MarketManager {
     private final ArrayList<User> users = new ArrayList<>();
@@ -14,16 +21,44 @@ public class MarketManager {
     }
 
     public void init() {
-        // TODO: init data by api
         try {
-            addUser("gholam", "xyz", "golam@gmail.com", new Date(), "xyz", 2);
-            addUser("mahdi", "123", "pmch@gmail.com", new Date(), "xyz", 10);
-            addProvider(1, "p1", new Date());
-            addProvider(2, "p2", new Date());
-            addCommodity(1, "c1", 1, 120, new ArrayList<>(Arrays.asList(Category.Technology, Category.Vegetables)), 2.2f, 4);
-            addCommodity(2, "c2", 2, 120, new ArrayList<>(), 3.2f, 5);
-            addCommodity(3, "c3", 1, 120, new ArrayList<>(Arrays.asList(Category.Technology)), 4.2f, 5);
-            getUserByUsername("mahdi").addToBuyList(3);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String usersJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/users");
+            JSONArray usersArray = JsonParser.parseJsonArray(usersJson);
+            for (Object obj : usersArray) {
+                JSONObject jsonObject = (JSONObject) obj;
+                String username = (String) jsonObject.get("username");
+                String password = (String) jsonObject.get("password");
+                String email = (String) jsonObject.get("email");
+                Date birthDate = dateFormat.parse((String) jsonObject.get("birthDate"));
+                String address = (String) jsonObject.get("address");
+                int credit = (int) (long) jsonObject.get("credit");
+                addUser(username, password, email, birthDate, address, credit);
+            }
+
+            String providersJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/providers");
+            JSONArray providersArray = JsonParser.parseJsonArray(providersJson);
+            for (Object obj : providersArray) {
+                JSONObject jsonObject = (JSONObject) obj;
+                int id = (int) (long) jsonObject.get("id");
+                String name = (String) jsonObject.get("name");
+                Date registryDate = dateFormat.parse((String) jsonObject.get("registryDate"));
+                addProvider(id, name, registryDate);
+            }
+
+            String commoditiesJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/commodities");
+            JSONArray commoditiesArray = JsonParser.parseJsonArray(commoditiesJson);
+            for (Object obj : commoditiesArray) {
+                JSONObject jsonObject = (JSONObject) obj;
+                int id = (int) (long) jsonObject.get("id");
+                String name = (String) jsonObject.get("name");
+                int providerId = (int) (long) jsonObject.get("providerId");
+                int price = (int) (long) jsonObject.get("price");
+                ArrayList<Category> categories = JsonParser.parseCategory((JSONArray) jsonObject.get("categories"));
+                float rating = (float) (double) jsonObject.get("rating");
+                int inStock = (int) (long) jsonObject.get("inStock");
+                addCommodity(id, name, providerId, price, categories, rating, inStock);
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
