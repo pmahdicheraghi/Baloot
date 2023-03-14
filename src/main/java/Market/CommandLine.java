@@ -29,7 +29,7 @@ public class CommandLine {
                     command = inputCommand;
                     json = "{}";
                 }
-                JSONObject params = JsonParser.parseJson(json);
+                JSONObject params = JsonParser.parseJsonObject(json);
                 switch (command) {
                     case "addUser": {
                         String username = (String) params.get("username");
