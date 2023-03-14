@@ -9,14 +9,16 @@ import java.util.List;
 public class Commodity {
     private final int id;
     private final String name;
+    private final int providerId;
     private final int price;
     private float rating;
-    private final int inStock;
+    private int inStock;
     private final ArrayList<Category> categories;
 
-    public Commodity(int id, String name, int price, ArrayList<Category> categories, float rating, int inStock) {
+    public Commodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) {
         this.id = id;
         this.name = name;
+        this.providerId = providerId;
         this.price = price;
         this.rating = rating;
         this.inStock = inStock;
@@ -25,6 +27,10 @@ public class Commodity {
 
     public int getId() {
         return id;
+    }
+
+    public int getProviderId() {
+        return providerId;
     }
 
     public int getInStock() {
@@ -49,6 +55,10 @@ public class Commodity {
 
     public float getRating() {
         return rating;
+    }
+
+    public void buy() {
+        inStock--;
     }
 
     public JSONObject toJsonObject(boolean withInStock) {

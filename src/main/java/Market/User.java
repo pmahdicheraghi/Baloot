@@ -14,6 +14,7 @@ class User {
     private int credit;
 
     private final ArrayList<Integer> buyList = new ArrayList<>();
+    private final ArrayList<Integer> purchasedList = new ArrayList<>();
 
     public User(String username, String password, String email, Date birthDay, String address, int credit) {
         this.username = username;
@@ -32,11 +33,26 @@ class User {
         this.credit = credit;
     }
 
-    String getUsername() {
-        return username;
+    public void purchaseCommodity(int commodityId) throws Exception {
+        for (int buyListCommodityId : buyList) {
+            if (buyListCommodityId == commodityId) {
+                Commodity commodity = MarketManager.getInstance().getCommodityById(commodityId);
+                if (commodity.getPrice() > credit) {
+                    throw new Exception("Not enough credit to buy");
+                }
+                if (commodity.getInStock() <= 0) {
+                    throw new Exception("Out of stock");
+                }
+                buyList.remove(Integer.valueOf(commodityId));
+                purchasedList.add(commodityId);
+                credit -= commodity.getPrice();
+                commodity.buy();
+            }
+        }
+        throw new Exception("First add item fo buyList");
     }
 
-    void addToBuyList(int commodityId) throws Exception {
+    public void addToBuyList(int commodityId) throws Exception {
         for (int buyListCommodityId : buyList) {
             if (buyListCommodityId == commodityId) {
                 throw new Exception("Item already exist in buyList");
@@ -45,7 +61,7 @@ class User {
         buyList.add(commodityId);
     }
 
-    void removeFromBuyList(int commodityId) throws Exception {
+    public void removeFromBuyList(int commodityId) throws Exception {
         for (Integer buyListCommodityId : buyList) {
             if (buyListCommodityId == commodityId) {
                 buyList.remove(buyListCommodityId);
@@ -57,6 +73,14 @@ class User {
 
     List<Integer> getBuyList() {
         return Collections.unmodifiableList(buyList);
+    }
+
+    List<Integer> getPurchasedList() {
+        return Collections.unmodifiableList(purchasedList);
+    }
+
+    String getUsername() {
+        return username;
     }
 
     public String getPassword() {
@@ -77,5 +101,9 @@ class User {
 
     public int getCredit() {
         return credit;
+    }
+
+    public void addCredit(int credit) {
+        this.credit += credit;
     }
 }

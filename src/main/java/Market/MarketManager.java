@@ -13,6 +13,22 @@ public class MarketManager {
     private MarketManager() {
     }
 
+    public void init() {
+        // TODO: init data by api
+        try {
+            addUser("gholam", "xyz", "golam@gmail.com", new Date(), "xyz", 2);
+            addUser("mahdi", "123", "pmch@gmail.com", new Date(), "xyz", 10);
+            addProvider(1, "p1", new Date());
+            addProvider(2, "p2", new Date());
+            addCommodity(1, "c1", 1, 120, new ArrayList<>(Arrays.asList(Category.Technology, Category.Vegetables)), 2.2f, 4);
+            addCommodity(2, "c2", 2, 120, new ArrayList<>(), 3.2f, 5);
+            addCommodity(3, "c3", 1, 120, new ArrayList<>(Arrays.asList(Category.Technology)), 4.2f, 5);
+            getUserByUsername("mahdi").addToBuyList(3);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     public static MarketManager getInstance() {
         if (marketManagerInstance == null)
             marketManagerInstance = new MarketManager();
@@ -39,7 +55,7 @@ public class MarketManager {
         }
     }
 
-    private User getUserByUsername(String username) {
+    private User findUserByUsername(String username) {
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 return user;
@@ -48,7 +64,7 @@ public class MarketManager {
         return null;
     }
 
-    private Provider getProviderById(int id) {
+    private Provider findProviderById(int id) {
         for (Provider provider : providers) {
             if (provider.getId() == id) {
                 return provider;
@@ -73,7 +89,7 @@ public class MarketManager {
                 throw new Exception("Invalid character in username");
             }
         }
-        User user = getUserByUsername(username);
+        User user = findUserByUsername(username);
         if (user == null) {
             users.add(new User(username, password, email, birthDay, address, credit));
             return true;
@@ -83,7 +99,7 @@ public class MarketManager {
     }
 
     public boolean addProvider(int id, String name, Date registryDate) throws Exception {
-        Provider provider = getProviderById(id);
+        Provider provider = findProviderById(id);
         if (provider != null) {
             throw new Exception("This id is already registered");
         }
@@ -92,7 +108,7 @@ public class MarketManager {
     }
 
     public boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws Exception {
-        Provider provider = getProviderById(providerId);
+        Provider provider = findProviderById(providerId);
         if (provider == null) {
             throw new Exception("Provider id not found");
         }
@@ -100,7 +116,7 @@ public class MarketManager {
         if (commodity != null) {
             throw new Exception("This id is already registered");
         }
-        commodities.add(new Commodity(id, name, price, categories, rating, inStock));
+        commodities.add(new Commodity(id, name, providerId, price, categories, rating, inStock));
         return true;
     }
 
@@ -112,7 +128,7 @@ public class MarketManager {
         if (score < 1 || score > 10) {
             throw new Exception("Invalid score");
         }
-        User user = getUserByUsername(username);
+        User user = findUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
         }
@@ -132,9 +148,8 @@ public class MarketManager {
         return true;
     }
 
-
     public boolean addToBuyList(String username, int commodityId) throws Exception {
-        User user = getUserByUsername(username);
+        User user = findUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
         }
@@ -149,9 +164,8 @@ public class MarketManager {
         return true;
     }
 
-
     public boolean removeFromBuyList(String username, int commodityId) throws Exception {
-        User user = getUserByUsername(username);
+        User user = findUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
         }
@@ -169,7 +183,23 @@ public class MarketManager {
             throw new Exception("Commodity not found");
         }
         return commodity;
-     }
+    }
+
+    public Provider getProviderById(int id) throws Exception {
+        Provider provider = findProviderById(id);
+        if (provider == null) {
+            throw new Exception("Provider not found");
+        }
+        return provider;
+    }
+
+    public User getUserByUsername(String username) throws Exception {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        return user;
+    }
 
     public List<Commodity> getCommoditiesByCategory(Category category) {
         List<Commodity> temp = new ArrayList<>();
@@ -182,7 +212,7 @@ public class MarketManager {
     }
 
     public List<Commodity> getBuyList(String username) throws Exception {
-        User user = getUserByUsername(username);
+        User user = findUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
         }
@@ -192,6 +222,27 @@ public class MarketManager {
             commodityArrayList.add(getCommodityById(buyItem));
         }
         return Collections.unmodifiableList(commodityArrayList);
+    }
+
+    public List<Commodity> getPurchasedList(String username) throws Exception {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        List<Integer> purchasedList = user.getPurchasedList();
+        ArrayList<Commodity> commodityArrayList = new ArrayList<>();
+        for (int buyItem : purchasedList) {
+            commodityArrayList.add(getCommodityById(buyItem));
+        }
+        return Collections.unmodifiableList(commodityArrayList);
+    }
+
+    public void addCreditToUser(String username, int credit) throws Exception {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        user.addCredit(credit);
     }
 
 }
