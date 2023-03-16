@@ -14,7 +14,7 @@ public class Server {
         MarketManager mm = MarketManager.getInstance();
         mm.init();
 
-        Javalin app = Javalin.create(config -> config.staticFiles.add("/public", Location.CLASSPATH)).start(7070);
+        Javalin app = Javalin.create().start(7070);
 
         app.get("commodities", ctx -> {
             List<Commodity> commoditiesList = mm.getCommoditiesList();

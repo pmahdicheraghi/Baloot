@@ -14,7 +14,7 @@ public class MarketManager {
     private final ArrayList<Provider> providers = new ArrayList<>();
     private final ArrayList<Commodity> commodities = new ArrayList<>();
     private final ArrayList<Rating> ratings = new ArrayList<>();
-
+    private final ArrayList<Comment> comments = new ArrayList<>();
     private static MarketManager marketManagerInstance = null;
 
     private MarketManager() {
@@ -59,6 +59,12 @@ public class MarketManager {
                 int inStock = (int) (long) jsonObject.get("inStock");
                 addCommodity(id, name, providerId, price, categories, rating, inStock);
             }
+            String commentsJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/comments");
+            JSONArray commentsArray = JsonParser.parseJsonArray(commentsJson);
+            for (Object obj : commentsArray){
+                JSONObject jsonObject = (JSONObject) obj;
+                String username = findUserByEmail((String)jsonObject.get("userEmail")).getUsername();
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -98,7 +104,13 @@ public class MarketManager {
         }
         return null;
     }
-
+    private User findUserByEmail(String email){
+        for (User user:users){
+            if(user.getEmail().equals(email))
+                return user;
+        }
+        return null;
+    }
     private Provider findProviderById(int id) {
         for (Provider provider : providers) {
             if (provider.getId() == id) {
