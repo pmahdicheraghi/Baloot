@@ -138,5 +138,82 @@ public class MarketManagerTest {
             fail();
         }
     }
+    @Test
+    public void testVoteFunctionality(){
+        MarketManager mm = MarketManager.getInstance();
+        mm.init(); //In order to get comments.
+        try {
+            Comment comment0 = mm.getCommentById(0);
+            mm.vote(comment0,"ali",1,0);
+            assertEquals(comment0.getLikes(),1);
+            assertEquals(comment0.getDislikes(),0);
+            mm.vote(comment0,"ali",1,0);
+            assertEquals(comment0.getLikes(),1);
+            assertEquals(comment0.getDislikes(),0);
+            mm.vote(comment0,"amir",1,0);
+            assertEquals(comment0.getLikes(),2);
+            assertEquals(comment0.getDislikes(),0);
+            mm.vote(comment0,"amir",-1,0);
+            assertEquals(comment0.getLikes(),1);
+            assertEquals(comment0.getDislikes(),1);
+            mm.vote(comment0,"ali",0,0);
+            assertEquals(comment0.getLikes(),0);
+            assertEquals(comment0.getDislikes(),1);
+        }
+        catch(Exception e){
+            fail();
+        }
+    }
+    @Test
+    public void searchCommoditiesByPrice(){
+        MarketManager mm = MarketManager.getInstance();
+        try {
+            Date date = new Date();
+            mm.addProvider(0,"MarkoPolo",date);
+            mm.addCommodity(0,"Iphone14",0,2000, new ArrayList<>(Arrays.asList(Category.Technology)),7,10);
+            mm.addCommodity(1,"Iphone13",0,1500, new ArrayList<>(Arrays.asList(Category.Technology)),6,7);
+            assertEquals(mm.getCommoditiesWithinPrice(1500,2000).size(),2);
+            assertEquals(mm.getCommoditiesWithinPrice(-1,10000).size(),0);
+            assertEquals(mm.getCommoditiesWithinPrice(1000,500).size(),0);
+            assertEquals(mm.getCommoditiesWithinPrice(1200,1300).size(),0);
+        }
+        catch (Exception e){
+            fail();
+        }
+    }
+    @Test
+    public void displayBuyList(){
+        MarketManager mm = MarketManager.getInstance();
+        try {
+            mm.addProvider(0, "MarkoPolo", new Date());
+            mm.addCommodity(0, "Iphone14", 0, 2000, new ArrayList<>(Arrays.asList(Category.Technology)), 7, 10);
+            mm.addCommodity(1, "Iphone13", 0, 1500, new ArrayList<>(Arrays.asList(Category.Technology)), 6, 0);
+            mm.addUser("alikhafan","1234","alikhafan@gmail.com",new Date(),"nezamabad",2000);
+
+            mm.addToBuyList("alikhafan",0);
+            assertEquals(mm.getUserByUsername("alikhafan").getBuyList().size(),1);
+        }
+        catch (Exception e){
+            fail();
+        }
+        try{
+            mm.addToBuyList("golabi",0);
+        }
+        catch (Exception e){
+            assertEquals(e.getMessage(),"User not found");
+        }
+        try{
+            mm.addToBuyList("alikhafan",1);
+        }
+        catch (Exception e){
+            assertEquals(e.getMessage(),"Out of stoke");
+        }
+        try{
+            mm.addToBuyList("alikhafan",100);
+        }
+        catch(Exception e){
+            assertEquals(e.getMessage(),"Commodity not found");
+        }
+    }
 
 }

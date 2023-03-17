@@ -262,6 +262,8 @@ public class MarketManager {
 
     public List<Commodity> getCommoditiesWithinPrice(int startPrice, int endPrice) {
         List<Commodity> temp = new ArrayList<>();
+        if(startPrice<0 || endPrice<0)
+            return temp;
         for (Commodity commodity : commodities) {
             if (commodity.getPrice() >= startPrice && commodity.getPrice() <= endPrice) {
                 temp.add(commodity);
