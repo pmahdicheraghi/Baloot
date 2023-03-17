@@ -4,9 +4,11 @@ import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
@@ -80,7 +82,7 @@ public class Server {
             int commodityId = Integer.parseInt(ctx.pathParam("commodity_id"));
             Commodity commodity = mm.getCommodityById(commodityId);
             File commodityFile = new File("src/main/resources/Commodity.html");
-            Document doc = Jsoup.parse(commodityFile, "UTF-8", "http://http://localhost:7070/");
+            Document doc = Jsoup.parse(commodityFile, "UTF-8", "http://localhost:7070/");
             doc.getElementById("id").html("Id: " + commodity.getId());
             doc.getElementById("name").html("Name: " + commodity.getName());
             doc.getElementById("providerId").html("Provider Id: " + commodity.getProviderId());
@@ -91,11 +93,52 @@ public class Server {
             doc.getElementById("addToBuyList").attr("onClick",
                     "window.location.href = '/addToBuyList/' + document.getElementById('user_id').value + '/" + commodity.getId() + "'");
             doc.getElementById("rateCommodity").attr("onClick",
-                    "window.location.href = '/rateCommodity/' + document.getElementById('user_id').value + '/" + commodity.getId() + "/' + document.getElementById('quantity').value");
-            // TODO: add comments
+                    "window.location.href ='/rateCommodity/' + document.getElementById('user_id').value + '/" + commodity.getId() + "/' + document.getElementById('quantity').value");
+            ArrayList<Comment> commodityComments= mm.getCommentListForCommodityById(commodityId);
+            for (Comment comment : commodityComments){
+                String likeNum=String.valueOf(comment.getLikes());
+                String dislikeNum=String.valueOf(comment.getDislikes());
+                String likeDislikeButtons = "<td>\n" +
+                        "  <form action=\"\" method=\"POST\">\n" +
+                        "    <label for=\"form_comment_id_1\">" + likeNum + "</label>\n" +
+                        "    <input\n" +
+                        "      id=\"form_comment_id_1\"\n" +
+                        "      type=\"hidden\"\n" +
+                        "      name=\"comment_id\"\n" +
+                        "      value=\"01\"\n" +
+                        "    />\n" +
+                        "  </form>\n" +
+                        "</td>\n" +
+                        "<td>\n" +
+                        "  <form action=\"\" method=\"POST\">\n" +
+                        "    <label for=\"form_comment_id_2\">"+ dislikeNum+ "</label>\n" +
+                        "    <input\n" +
+                        "      id=\"form_comment_id_2\"\n" +
+                        "      type=\"hidden\"\n" +
+                        "      name=\"comment_id\"\n" +
+                        "      value=\"01\"\n" +
+                        "    />\n" +
+                        "  </form>\n" +
+                        "</td>";
+
+                doc.getElementById("commentsSection").prepend("<td>" + comment.getUsername() +"</td>\n"
+                + "<td>" + comment.getComment() + "</td>\n"
+                + "<td>" + comment.getDate() + "</td>\n" + likeDislikeButtons);
+            }
             ctx.html(doc.html());
         });
-
+        app.get("/voteComment/{user_name}/{comment_Id}/{vote}", ctx -> {
+            int vote= Integer.parseInt(ctx.pathParam("vote"));
+            int commentId = Integer.parseInt(ctx.pathParam("comment_Id"));
+            String username = ctx.pathParam("user_name");
+            mm.getUserByUsername(username);
+            Comment comment = mm.getCommentById(commentId);
+            if(vote==1)
+                comment.upvote();
+            else if (vote==-1)
+                comment.downvote();
+            ctx.redirect("/commodities/"+comment.getCommodityId());
+        });
         app.get("/providers/{provider_id}", ctx -> {
             int providerId = Integer.parseInt(ctx.pathParam("provider_id"));
             Provider provider = mm.getProviderById(providerId);
@@ -213,6 +256,8 @@ public class Server {
         });
 
         app.error(404, ctx -> {
+            String url = ctx.req().getRequestURI();
+            System.out.println("404 error for URL: " + url);
             File errorFile = new File("src/main/resources/404.html");
             Document doc;
             try {

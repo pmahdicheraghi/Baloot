@@ -4,10 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class MarketManager {
     private final ArrayList<User> users = new ArrayList<>();
@@ -63,10 +60,14 @@ public class MarketManager {
             JSONArray commentsArray = JsonParser.parseJsonArray(commentsJson);
             for (Object obj : commentsArray){
                 JSONObject jsonObject = (JSONObject) obj;
-                String username = findUserByEmail((String)jsonObject.get("userEmail")).getUsername();
+                String username = Objects.requireNonNull(findUserByEmail((String) jsonObject.get("userEmail"))).getUsername();
+                int commodityId = (int)(long)jsonObject.get("commodityId");
+                String comment=(String)jsonObject.get("text");
+                Date date = dateFormat.parse((String) jsonObject.get("date"));
+                comments.add(new Comment(username,commodityId,comment,date));
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -321,5 +322,21 @@ public class MarketManager {
         }
         user.addCredit(credit);
     }
-
+    public ArrayList<Comment> getCommentListForCommodityById(int commodityId){
+        ArrayList<Comment> commentsToBeReturned = new ArrayList<>();
+        for (Comment comment : comments){
+            if (comment.getCommodityId()==commodityId)
+                commentsToBeReturned.add(comment);
+        }
+        return commentsToBeReturned;
+    }
+    public Comment getCommentById(int id)throws Exception{
+        if(id<0)
+            throw new Exception("Invalid id for a comment!");
+        for (Comment comment : comments) {
+            if (comment.getId() == id)
+                return comment;
+        }
+        throw new Exception("Comment with the given Id doesn't exist!");
+    }
 }
