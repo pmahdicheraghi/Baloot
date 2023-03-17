@@ -12,6 +12,7 @@ public class MarketManager {
     private final ArrayList<Commodity> commodities = new ArrayList<>();
     private final ArrayList<Rating> ratings = new ArrayList<>();
     private final ArrayList<Comment> comments = new ArrayList<>();
+    private final ArrayList<Vote> votes = new ArrayList<>();
     private static MarketManager marketManagerInstance = null;
 
     private MarketManager() {
@@ -338,5 +339,43 @@ public class MarketManager {
                 return comment;
         }
         throw new Exception("Comment with the given Id doesn't exist!");
+    }
+    public void vote(Comment comment,String username,int userVote,int commentId){
+        for (Vote vote : votes){
+            if((vote.getUsername().equals(username) ) && (vote.getCommentId()==commentId )) {
+
+                if (vote.getVote() == userVote) {
+                    return;
+                }
+                if (vote.getVote()==0){
+                    if(userVote==1) {
+                        comment.like();
+                    }
+                    else if(userVote==-1){
+                        comment.dislike();
+                    }
+                }
+                else if(vote.getVote()==-1){
+                    if(userVote==1)
+                        comment.dislikeToLike();
+                    if(userVote==0)
+                        comment.abstain(-1);
+                }
+                else {
+                    if(userVote==0)
+                        comment.abstain(1);
+                    else comment.likeToDislike();
+                }
+                vote.updateVote(userVote);
+                return;
+            }
+        }
+
+        Vote voteToBeAdded=new Vote(userVote,commentId,username);
+        votes.add(voteToBeAdded);
+        if(userVote==1)
+            comment.like();
+        else if(userVote==-1)
+            comment.dislike();
     }
 }

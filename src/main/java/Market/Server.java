@@ -120,10 +120,10 @@ public class Server {
                         "    />\n" +
                         "  </form>\n" +
                         "</td>";
-
                 doc.getElementById("commentsSection").prepend("<td>" + comment.getUsername() +"</td>\n"
                 + "<td>" + comment.getComment() + "</td>\n"
-                + "<td>" + comment.getDate() + "</td>\n" + likeDislikeButtons);
+                + "<td>" + comment.getDate() + "</td>\n" +
+                "</td>\n" + likeDislikeButtons + "<td>" + comment.getId());
             }
             ctx.html(doc.html());
         });
@@ -133,10 +133,7 @@ public class Server {
             String username = ctx.pathParam("user_name");
             mm.getUserByUsername(username);
             Comment comment = mm.getCommentById(commentId);
-            if(vote==1)
-                comment.upvote();
-            else if (vote==-1)
-                comment.downvote();
+            mm.vote(comment,username,vote,commentId);
             ctx.redirect("/commodities/"+comment.getCommodityId());
         });
         app.get("/providers/{provider_id}", ctx -> {

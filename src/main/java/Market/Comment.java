@@ -24,8 +24,8 @@ public class Comment {
         this.date=date;
         this.increaseCount();
     }
-    public void upvote(){upvote++;}
-    public void downvote(){downvote++;}
+    public void like(){upvote++;}
+    public void dislike(){downvote++;}
     private void increaseCount(){count++;}
     public int getId(){return id;}
     public int getCommodityId(){return commodityId;}
@@ -38,4 +38,18 @@ public class Comment {
     }
     public int getLikes(){return upvote;}
     public int getDislikes(){return downvote;}
+    public void likeToDislike(){
+        upvote--;
+        downvote++;
+    }
+    public void dislikeToLike(){
+        upvote++;
+        downvote--;
+    }
+    public void abstain(int likeOrDislike){
+        if(likeOrDislike==1)
+            upvote--;
+        else if(likeOrDislike==-1)
+            downvote--;
+    }
 }
