@@ -1,55 +1,87 @@
 package Market;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.text.SimpleDateFormat;
 
 
 public class Comment {
-
-    private static int count=0;
     private final String username;
     private final int commodityId;
     private final int id;
     private final String comment;
     private final Date date;
-    private int upvote=0;
-    private int downvote=0;
+    private final ArrayList<String> upVotes = new ArrayList<>();
+    private final ArrayList<String> downVotes = new ArrayList<>();
 
 
-    public Comment(String username,int commodityId,String comment,Date date){
-        this.username=username;
-        this.commodityId=commodityId;
-        this.id=this.count;
-        this.comment=comment;
-        this.date=date;
-        this.increaseCount();
+    public Comment(int id, String username, int commodityId, String comment, Date date) {
+        this.username = username;
+        this.commodityId = commodityId;
+        this.id = id;
+        this.comment = comment;
+        this.date = date;
     }
-    public void like(){upvote++;}
-    public void dislike(){downvote++;}
-    private void increaseCount(){count++;}
-    public int getId(){return id;}
-    public int getCommodityId(){return commodityId;}
 
-    public String getUsername(){return username;}
-    public String getComment(){return comment;}
-    public String getDate(){
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        return formatter.format(date);
+    public void upVote(String username) {
+        downVotes.removeIf(user -> user.equals(username));
+        for (String user : upVotes) {
+            if (user.equals(username)) {
+                return;
+            }
+        }
+        upVotes.add(username);
     }
-    public int getLikes(){return upvote;}
-    public int getDislikes(){return downvote;}
-    public void likeToDislike(){
-        upvote--;
-        downvote++;
+
+    public void downVote(String username) {
+        upVotes.removeIf(user -> user.equals(username));
+        for (String user : downVotes) {
+            if (user.equals(username)) {
+                return;
+            }
+        }
+        downVotes.add(username);
     }
-    public void dislikeToLike(){
-        upvote++;
-        downvote--;
+
+    public void removeVote(String username) {
+        for (String user : upVotes) {
+            if (user.equals(username)) {
+                upVotes.remove(user);
+                return;
+            }
+        }
+        for (String user : downVotes) {
+            if (user.equals(username)) {
+                downVotes.remove(user);
+                return;
+            }
+        }
     }
-    public void abstain(int likeOrDislike){
-        if(likeOrDislike==1)
-            upvote--;
-        else if(likeOrDislike==-1)
-            downvote--;
+
+    public int getId() {
+        return id;
+    }
+
+    public int getCommodityId() {
+        return commodityId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public int getLikes() {
+        return upVotes.size();
+    }
+
+    public int getDislikes() {
+        return downVotes.size();
     }
 }

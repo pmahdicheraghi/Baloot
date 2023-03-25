@@ -12,7 +12,6 @@ public class MarketManager {
     private final ArrayList<Commodity> commodities = new ArrayList<>();
     private final ArrayList<Rating> ratings = new ArrayList<>();
     private final ArrayList<Comment> comments = new ArrayList<>();
-    private final ArrayList<Vote> votes = new ArrayList<>();
     private static MarketManager marketManagerInstance = null;
 
     private MarketManager() {
@@ -57,15 +56,17 @@ public class MarketManager {
                 int inStock = (int) (long) jsonObject.get("inStock");
                 addCommodity(id, name, providerId, price, categories, rating, inStock);
             }
+
             String commentsJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/comments");
             JSONArray commentsArray = JsonParser.parseJsonArray(commentsJson);
-            for (Object obj : commentsArray){
+            for (Object obj : commentsArray) {
                 JSONObject jsonObject = (JSONObject) obj;
                 String username = Objects.requireNonNull(findUserByEmail((String) jsonObject.get("userEmail"))).getUsername();
-                int commodityId = (int)(long)jsonObject.get("commodityId");
-                String comment=(String)jsonObject.get("text");
+                int commodityId = (int) (long) jsonObject.get("commodityId");
+                String comment = (String) jsonObject.get("text");
                 Date date = dateFormat.parse((String) jsonObject.get("date"));
-                comments.add(new Comment(username,commodityId,comment,date));
+                int id = comments.size() + 1;
+                addComment(id, username, commodityId, comment, date);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -106,13 +107,15 @@ public class MarketManager {
         }
         return null;
     }
-    private User findUserByEmail(String email){
-        for (User user:users){
-            if(user.getEmail().equals(email))
+
+    private User findUserByEmail(String email) {
+        for (User user : users) {
+            if (user.getEmail().equals(email))
                 return user;
         }
         return null;
     }
+
     private Provider findProviderById(int id) {
         for (Provider provider : providers) {
             if (provider.getId() == id) {
@@ -262,8 +265,6 @@ public class MarketManager {
 
     public List<Commodity> getCommoditiesWithinPrice(int startPrice, int endPrice) {
         List<Commodity> temp = new ArrayList<>();
-        if(startPrice<0 || endPrice<0)
-            return temp;
         for (Commodity commodity : commodities) {
             if (commodity.getPrice() >= startPrice && commodity.getPrice() <= endPrice) {
                 temp.add(commodity);
@@ -318,66 +319,59 @@ public class MarketManager {
         return true;
     }
 
-    public void addCreditToUser(String username, int credit) throws Exception {
+    public boolean addCreditToUser(String username, int credit) throws Exception {
         User user = findUserByUsername(username);
         if (user == null) {
             throw new Exception("User not found");
         }
         user.addCredit(credit);
+        return true;
     }
-    public ArrayList<Comment> getCommentListForCommodityById(int commodityId){
+
+    public boolean addComment(int id, String username, int commodityId, String comment, Date date) throws Exception {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new Exception("User not found");
+        }
+        Commodity commodity = findCommodityById(commodityId);
+        if (commodity == null) {
+            throw new Exception("Commodity not found");
+        }
+        comments.add(new Comment(id, username, commodityId, comment, date));
+        return true;
+    }
+
+    public ArrayList<Comment> getCommentListForCommodityById(int commodityId) {
         ArrayList<Comment> commentsToBeReturned = new ArrayList<>();
-        for (Comment comment : comments){
-            if (comment.getCommodityId()==commodityId)
+        for (Comment comment : comments) {
+            if (comment.getCommodityId() == commodityId)
                 commentsToBeReturned.add(comment);
         }
         return commentsToBeReturned;
     }
-    public Comment getCommentById(int id)throws Exception{
-        if(id<0)
-            throw new Exception("Invalid id for a comment!");
+
+    public Comment getCommentById(int id) throws Exception {
         for (Comment comment : comments) {
             if (comment.getId() == id)
                 return comment;
         }
         throw new Exception("Comment with the given Id doesn't exist!");
     }
-    public void vote(Comment comment,String username,int userVote,int commentId){
-        for (Vote vote : votes){
-            if((vote.getUsername().equals(username) ) && (vote.getCommentId()==commentId )) {
 
-                if (vote.getVote() == userVote) {
-                    return;
-                }
-                if (vote.getVote()==0){
-                    if(userVote==1) {
-                        comment.like();
-                    }
-                    else if(userVote==-1){
-                        comment.dislike();
-                    }
-                }
-                else if(vote.getVote()==-1){
-                    if(userVote==1)
-                        comment.dislikeToLike();
-                    if(userVote==0)
-                        comment.abstain(-1);
-                }
-                else {
-                    if(userVote==0)
-                        comment.abstain(1);
-                    else comment.likeToDislike();
-                }
-                vote.updateVote(userVote);
-                return;
-            }
+    public boolean vote(String username, int userVote, int commentId) throws Exception {
+        Comment comment = getCommentById(commentId);
+        if (comment == null) {
+            throw new Exception("Comment not found");
         }
-
-        Vote voteToBeAdded=new Vote(userVote,commentId,username);
-        votes.add(voteToBeAdded);
-        if(userVote==1)
-            comment.like();
-        else if(userVote==-1)
-            comment.dislike();
+        if (userVote == 1) {
+            comment.upVote(username);
+        } else if (userVote == -1) {
+            comment.downVote(username);
+        } else if (userVote == 0) {
+            comment.removeVote(username);
+        } else {
+            throw new Exception("Invalid vote");
+        }
+        return true;
     }
 }

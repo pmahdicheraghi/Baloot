@@ -1,10 +1,8 @@
 package Market;
 
 import io.javalin.Javalin;
-import io.javalin.http.staticfiles.Location;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,48 +92,31 @@ public class Server {
                     "window.location.href = '/addToBuyList/' + document.getElementById('user_id').value + '/" + commodity.getId() + "'");
             doc.getElementById("rateCommodity").attr("onClick",
                     "window.location.href ='/rateCommodity/' + document.getElementById('user_id').value + '/" + commodity.getId() + "/' + document.getElementById('quantity').value");
-            ArrayList<Comment> commodityComments= mm.getCommentListForCommodityById(commodityId);
-            for (Comment comment : commodityComments){
-                String likeNum=String.valueOf(comment.getLikes());
-                String dislikeNum=String.valueOf(comment.getDislikes());
-                String likeDislikeButtons = "<td>\n" +
-                        "  <form action=\"\" method=\"POST\">\n" +
-                        "    <label for=\"form_comment_id_1\">" + likeNum + "</label>\n" +
-                        "    <input\n" +
-                        "      id=\"form_comment_id_1\"\n" +
-                        "      type=\"hidden\"\n" +
-                        "      name=\"comment_id\"\n" +
-                        "      value=\"01\"\n" +
-                        "    />\n" +
-                        "  </form>\n" +
-                        "</td>\n" +
-                        "<td>\n" +
-                        "  <form action=\"\" method=\"POST\">\n" +
-                        "    <label for=\"form_comment_id_2\">"+ dislikeNum+ "</label>\n" +
-                        "    <input\n" +
-                        "      id=\"form_comment_id_2\"\n" +
-                        "      type=\"hidden\"\n" +
-                        "      name=\"comment_id\"\n" +
-                        "      value=\"01\"\n" +
-                        "    />\n" +
-                        "  </form>\n" +
-                        "</td>";
-                doc.getElementById("commentsSection").prepend("<td>" + comment.getUsername() +"</td>\n"
-                + "<td>" + comment.getComment() + "</td>\n"
-                + "<td>" + comment.getDate() + "</td>\n" +
-                "</td>\n" + likeDislikeButtons + "<td>" + comment.getId());
+
+            ArrayList<Comment> commodityComments = mm.getCommentListForCommodityById(commodityId);
+            for (Comment comment : commodityComments) {
+                doc.getElementById("comments").append("<tr>" +
+                        "<td>" + comment.getUsername() + "</td>\n" +
+                        "<td>" + comment.getComment() + "</td>\n" +
+                        "<td>" + comment.getDate().toString() + "</td>\n" +
+                        "<td>" + comment.getLikes() + "</td>\n" +
+                        "<td>" + comment.getDislikes() + "</td>\n" +
+                        "<td><button onclick=\"window.location.href = '/voteComment/' + document.getElementById('user_id').value + '/" + comment.getId() + "/1'\">Like</button></td>" +
+                        "<td><button onclick=\"window.location.href = '/voteComment/' + document.getElementById('user_id').value + '/" + comment.getId() + "/-1'\">Dislike</button></td>" +
+                        "</tr>");
             }
             ctx.html(doc.html());
         });
+
         app.get("/voteComment/{user_name}/{comment_Id}/{vote}", ctx -> {
-            int vote= Integer.parseInt(ctx.pathParam("vote"));
+            int vote = Integer.parseInt(ctx.pathParam("vote"));
             int commentId = Integer.parseInt(ctx.pathParam("comment_Id"));
             String username = ctx.pathParam("user_name");
-            mm.getUserByUsername(username);
+            mm.vote(username, vote, commentId);
             Comment comment = mm.getCommentById(commentId);
-            mm.vote(comment,username,vote,commentId);
-            ctx.redirect("/commodities/"+comment.getCommodityId());
+            ctx.redirect("/commodities/" + comment.getCommodityId());
         });
+
         app.get("/providers/{provider_id}", ctx -> {
             int providerId = Integer.parseInt(ctx.pathParam("provider_id"));
             Provider provider = mm.getProviderById(providerId);
@@ -173,6 +154,7 @@ public class Server {
             doc.getElementById("credit").html("Credit: " + user.getCredit());
 
             doc.getElementById("purchase").attr("onClick", "window.location.href = '/purchase/" + user.getUsername() + "'");
+            doc.getElementById("addCredit").attr("onClick", "window.location.href = '/addCredit/" + user.getUsername() + "/' + document.getElementById('creditNum').value");
 
             List<Commodity> buyList = mm.getBuyList(user_id);
             for (Commodity commodity : buyList) {
