@@ -221,7 +221,7 @@ public class Server {
             ctx.redirect("/users/" + username);
         });
 
-        app.exception(Exception.class, (e, ctx) -> {
+        app.exception(RuntimeException.class, (e, ctx) -> {
             e.printStackTrace();
             File errorFile = new File("src/main/resources/403.html");
             Document doc;

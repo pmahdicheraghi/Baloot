@@ -33,35 +33,35 @@ class User {
         this.credit = credit;
     }
 
-    public void purchase(int price) throws Exception {
+    public void purchase(int price) throws RuntimeException {
         if (buyList.size() == 0) {
-            throw new Exception("Buy list is empty");
+            throw new RuntimeException("Buy list is empty");
         }
         if (credit < price) {
-            throw new Exception("Not enough credit");
+            throw new RuntimeException("Not enough credit");
         }
         credit -= price;
         purchasedList.addAll(buyList);
         buyList.clear();
     }
 
-    public void addToBuyList(int commodityId) throws Exception {
+    public void addToBuyList(int commodityId) throws RuntimeException {
         for (int buyListCommodityId : buyList) {
             if (buyListCommodityId == commodityId) {
-                throw new Exception("Item already exist in buyList");
+                throw new RuntimeException("Item already exist in buyList");
             }
         }
         buyList.add(commodityId);
     }
 
-    public void removeFromBuyList(int commodityId) throws Exception {
+    public void removeFromBuyList(int commodityId) throws RuntimeException {
         for (Integer buyListCommodityId : buyList) {
             if (buyListCommodityId == commodityId) {
                 buyList.remove(buyListCommodityId);
                 return;
             }
         }
-        throw new Exception("Item not found");
+        throw new RuntimeException("Item not found");
     }
 
     List<Integer> getBuyList() {

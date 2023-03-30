@@ -128,7 +128,7 @@ public class CommandLine {
                     case "exit":
                         return;
                     default:
-                        throw new Exception("Invalid command: " + command);
+                        throw new RuntimeException("Invalid command: " + command);
                 }
             } catch (Exception e) {
                 System.out.println(toResultJson(false, e.getMessage()));

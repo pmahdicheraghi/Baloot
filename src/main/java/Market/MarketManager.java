@@ -134,11 +134,11 @@ public class MarketManager {
         return null;
     }
 
-    public boolean addUser(String username, String password, String email, Date birthDay, String address, int credit) throws Exception {
+    public boolean addUser(String username, String password, String email, Date birthDay, String address, int credit) throws RuntimeException {
         CharSequence[] invalidChars = {" ", "‌", "!", "@", "#", "$", "%", "^", "&", "*"};
         for (CharSequence invalidChar : invalidChars) {
             if (username.contains(invalidChar)) {
-                throw new Exception("Invalid character in username");
+                throw new RuntimeException("Invalid character in username");
             }
         }
         User user = findUserByUsername(username);
@@ -150,23 +150,23 @@ public class MarketManager {
         return true;
     }
 
-    public boolean addProvider(int id, String name, Date registryDate) throws Exception {
+    public boolean addProvider(int id, String name, Date registryDate) throws RuntimeException {
         Provider provider = findProviderById(id);
         if (provider != null) {
-            throw new Exception("This id is already registered");
+            throw new RuntimeException("This id is already registered");
         }
         providers.add(new Provider(id, name, registryDate));
         return true;
     }
 
-    public boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws Exception {
+    public boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws RuntimeException {
         Provider provider = findProviderById(providerId);
         if (provider == null) {
-            throw new Exception("Provider id not found");
+            throw new RuntimeException("Provider id not found");
         }
         Commodity commodity = findCommodityById(id);
         if (commodity != null) {
-            throw new Exception("This id is already registered");
+            throw new RuntimeException("This id is already registered");
         }
         commodities.add(new Commodity(id, name, providerId, price, categories, rating, inStock));
         return true;
@@ -176,17 +176,17 @@ public class MarketManager {
         return Collections.unmodifiableList(commodities);
     }
 
-    public boolean rateCommodity(String username, int commodityId, int score) throws Exception {
+    public boolean rateCommodity(String username, int commodityId, int score) throws RuntimeException {
         if (score < 1 || score > 10) {
-            throw new Exception("Invalid score");
+            throw new RuntimeException("Invalid score");
         }
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         Commodity commodity = findCommodityById(commodityId);
         if (commodity == null) {
-            throw new Exception("Commodity not found");
+            throw new RuntimeException("Commodity not found");
         }
         for (Rating rating : ratings) {
             if (rating.getCommodityId() == commodityId && rating.getUsername().equals(username)) {
@@ -200,55 +200,55 @@ public class MarketManager {
         return true;
     }
 
-    public boolean addToBuyList(String username, int commodityId) throws Exception {
+    public boolean addToBuyList(String username, int commodityId) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         Commodity commodity = findCommodityById(commodityId);
         if (commodity == null) {
-            throw new Exception("Commodity not found");
+            throw new RuntimeException("Commodity not found");
         }
         if (commodity.getInStock() <= 0) {
-            throw new Exception("Out of stoke");
+            throw new RuntimeException("Out of stoke");
         }
         user.addToBuyList(commodityId);
         return true;
     }
 
-    public boolean removeFromBuyList(String username, int commodityId) throws Exception {
+    public boolean removeFromBuyList(String username, int commodityId) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         Commodity commodity = findCommodityById(commodityId);
         if (commodity == null) {
-            throw new Exception("Commodity not found");
+            throw new RuntimeException("Commodity not found");
         }
         user.removeFromBuyList(commodityId);
         return true;
     }
 
-    public Commodity getCommodityById(int id) throws Exception {
+    public Commodity getCommodityById(int id) throws RuntimeException {
         Commodity commodity = findCommodityById(id);
         if (commodity == null) {
-            throw new Exception("Commodity not found");
+            throw new RuntimeException("Commodity not found");
         }
         return commodity;
     }
 
-    public Provider getProviderById(int id) throws Exception {
+    public Provider getProviderById(int id) throws RuntimeException {
         Provider provider = findProviderById(id);
         if (provider == null) {
-            throw new Exception("Provider not found");
+            throw new RuntimeException("Provider not found");
         }
         return provider;
     }
 
-    public User getUserByUsername(String username) throws Exception {
+    public User getUserByUsername(String username) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         return user;
     }
@@ -273,10 +273,10 @@ public class MarketManager {
         return temp;
     }
 
-    public List<Commodity> getBuyList(String username) throws Exception {
+    public List<Commodity> getBuyList(String username) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         List<Integer> buyList = user.getBuyList();
         ArrayList<Commodity> commodityArrayList = new ArrayList<>();
@@ -286,10 +286,10 @@ public class MarketManager {
         return Collections.unmodifiableList(commodityArrayList);
     }
 
-    public List<Commodity> getPurchasedList(String username) throws Exception {
+    public List<Commodity> getPurchasedList(String username) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         List<Integer> purchasedList = user.getPurchasedList();
         ArrayList<Commodity> commodityArrayList = new ArrayList<>();
@@ -299,10 +299,10 @@ public class MarketManager {
         return Collections.unmodifiableList(commodityArrayList);
     }
 
-    public boolean purchase(String username) throws Exception {
+    public boolean purchase(String username) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         List<Commodity> buyList = getBuyList(username);
         int totalPrice = 0;
@@ -311,7 +311,7 @@ public class MarketManager {
         }
         for (Commodity commodity : buyList) {
             if (commodity.getInStock() <= 0) {
-                throw new Exception("Out of stoke");
+                throw new RuntimeException("Out of stoke");
             }
             commodity.buy();
         }
@@ -319,23 +319,23 @@ public class MarketManager {
         return true;
     }
 
-    public boolean addCreditToUser(String username, int credit) throws Exception {
+    public boolean addCreditToUser(String username, int credit) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         user.addCredit(credit);
         return true;
     }
 
-    public boolean addComment(int id, String username, int commodityId, String comment, Date date) throws Exception {
+    public boolean addComment(int id, String username, int commodityId, String comment, Date date) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
-            throw new Exception("User not found");
+            throw new RuntimeException("User not found");
         }
         Commodity commodity = findCommodityById(commodityId);
         if (commodity == null) {
-            throw new Exception("Commodity not found");
+            throw new RuntimeException("Commodity not found");
         }
         comments.add(new Comment(id, username, commodityId, comment, date));
         return true;
@@ -350,18 +350,18 @@ public class MarketManager {
         return commentsToBeReturned;
     }
 
-    public Comment getCommentById(int id) throws Exception {
+    public Comment getCommentById(int id) throws RuntimeException {
         for (Comment comment : comments) {
             if (comment.getId() == id)
                 return comment;
         }
-        throw new Exception("Comment with the given Id doesn't exist!");
+        throw new RuntimeException("Comment with the given Id doesn't exist!");
     }
 
-    public boolean vote(String username, int userVote, int commentId) throws Exception {
+    public boolean vote(String username, int userVote, int commentId) throws RuntimeException {
         Comment comment = getCommentById(commentId);
         if (comment == null) {
-            throw new Exception("Comment not found");
+            throw new RuntimeException("Comment not found");
         }
         if (userVote == 1) {
             comment.upVote(username);
@@ -370,7 +370,7 @@ public class MarketManager {
         } else if (userVote == 0) {
             comment.removeVote(username);
         } else {
-            throw new Exception("Invalid vote");
+            throw new RuntimeException("Invalid vote");
         }
         return true;
     }

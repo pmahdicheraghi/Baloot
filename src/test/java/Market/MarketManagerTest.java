@@ -18,7 +18,7 @@ public class MarketManagerTest {
             assertTrue(r1);
             boolean r2 = mm.addUser("mahdi", "y", "pmgh@gmail.com", new Date(), "x", 0);
             assertTrue(r2);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
     }
@@ -29,7 +29,7 @@ public class MarketManagerTest {
         try {
             boolean r1 = mm.addUser("mah@di", "x", "pmch@gmail.com", new Date(), "x", 2);
             assertFalse(r1);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
     }
@@ -44,7 +44,7 @@ public class MarketManagerTest {
             assertTrue(r2);
             boolean r3 = mm.addProvider(1, "hassan", new Date());
             assertFalse(r3);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
     }
@@ -58,7 +58,7 @@ public class MarketManagerTest {
             assertTrue(r1);
             boolean r2 = mm.addCommodity(1, "bag", 4, 200, new ArrayList<>(), 8.3f, 20);
             assertFalse(r2);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
     }
@@ -70,7 +70,7 @@ public class MarketManagerTest {
             mm.addProvider(4, "mahdi", new Date());
             mm.addCommodity(2, "mobile", 4, 150, new ArrayList<>(), 5.2f, 2);
             assertFalse(mm.getCommoditiesList().isEmpty());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
     }
@@ -86,7 +86,7 @@ public class MarketManagerTest {
             assertEquals(4f, mm.getCommodityById(3).getRating());
             boolean r1 = mm.rateCommodity("mohsen", 3, 12);
             assertFalse(r1);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
     }
@@ -97,7 +97,7 @@ public class MarketManagerTest {
         try {
             boolean r1 = mm.addToBuyList("god", 3);
             assertFalse(r1);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
 
@@ -111,14 +111,14 @@ public class MarketManagerTest {
             assertTrue(r2);
             List<Commodity> cs = mm.getBuyList("hesam");
             assertEquals(0, cs.size());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
 
         try {
             boolean r1 = mm.removeFromBuyList("hesam", 4);
             assertFalse(r1);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertTrue(true);
         }
     }
@@ -134,7 +134,7 @@ public class MarketManagerTest {
             assertEquals("C5", c5.getName());
             List<Commodity> cs = mm.getCommoditiesByCategory(Category.Vegetables);
             assertNotEquals(0, cs.size());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
     }
@@ -157,7 +157,7 @@ public class MarketManagerTest {
             mm.vote("taqi", 0, 1);
             assertEquals(0, mm.getCommentById(1).getDislikes());
             assertEquals(0, mm.getCommentById(1).getLikes());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
     }
@@ -172,7 +172,7 @@ public class MarketManagerTest {
             assertEquals(2, mm.getCommoditiesWithinPrice(1500, 2000).size());
             assertEquals(0, mm.getCommoditiesWithinPrice(1000, 500).size());
             assertEquals(0, mm.getCommoditiesWithinPrice(1200, 1300).size());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
     }
@@ -187,25 +187,25 @@ public class MarketManagerTest {
             mm.addCommodity(10, "Iphone13", 10, 20, new ArrayList<>(Arrays.asList(Category.Technology)), 6, 0);
             mm.addToBuyList("alikhafan", 9);
             assertEquals(mm.getBuyList("alikhafan").size(), 1);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             fail();
         }
 
         try {
             mm.addToBuyList("golabi", 10);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertEquals(e.getMessage(), "User not found");
         }
 
         try {
             mm.addToBuyList("alikhafan", 10);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertEquals(e.getMessage(), "Out of stoke");
         }
 
         try {
             mm.addToBuyList("alikhafan", 11);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             assertEquals(e.getMessage(), "Commodity not found");
         }
     }
