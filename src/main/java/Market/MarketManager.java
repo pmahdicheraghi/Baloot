@@ -374,12 +374,12 @@ public class MarketManager {
     }
     public List<Commodity> getSuggestedCommodities(Commodity criterionCommodity)throws RuntimeException{
         List<Commodity> suggestedCommodities = new ArrayList<Commodity>();
-        List<Integer> scores = new ArrayList<Integer>();
+        List<Float> scores = new ArrayList<>();
         boolean addCondtion=true;
         for (Commodity com : commodities){
             if(com.getId()==criterionCommodity.getId())continue;
             boolean isInSimilarCategory = haveCommonCategory(com,criterionCommodity);
-            int score = 11 * (isInSimilarCategory ? 1 : 0) + (int) com.getRating();
+            float score = 11 * (isInSimilarCategory ? 1 : 0) +  com.getRating();
             for (int i=0 ; i<scores.size();i++){
                 if (score >= scores.get(i)) {
                     scores.add(i, score);
@@ -393,7 +393,7 @@ public class MarketManager {
                 suggestedCommodities.add(com);
             }
         }
-        return suggestedCommodities;
+        return suggestedCommodities.subList(0, Math.min(suggestedCommodities.size(), 5));
     }
     public static boolean haveCommonCategory(Commodity commodity1, Commodity commodity2) {
         for (Category category : commodity1.getCategories()) {
