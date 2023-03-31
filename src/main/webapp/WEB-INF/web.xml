@@ -51,7 +51,14 @@
         <servlet-name>CreditServlet</servlet-name>
         <url-pattern>/credit</url-pattern>
     </servlet-mapping>
-
+    <servlet>
+        <servlet-name>BuyListServlet</servlet-name>
+        <servlet-class>Market.Controller.BuyListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BuyListServlet</servlet-name>
+        <url-pattern>/buyList</url-pattern>
+    </servlet-mapping>
 
     <error-page>
         <error-code>404</error-code>

@@ -12,6 +12,7 @@ public class MarketManager {
     private final ArrayList<Commodity> commodities = new ArrayList<>();
     private final ArrayList<Rating> ratings = new ArrayList<>();
     private final ArrayList<Comment> comments = new ArrayList<>();
+    private final ArrayList<Discount> discounts = new ArrayList<>();
     private static MarketManager marketManagerInstance = null;
 
     private String loggedInUser = "";
@@ -106,6 +107,16 @@ public class MarketManager {
                 int id = comments.size() + 1;
                 addComment(id, username, commodityId, comment, date);
             }
+
+            String discountJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/discount");
+            JSONArray discountArray = JsonParser.parseJsonArray(discountJson);
+            for (Object obj : discountArray) {
+                JSONObject jsonObject = (JSONObject) obj;
+                String code = (String) jsonObject.get("discountCode");
+                int percent = (int) (long) jsonObject.get("discount");
+                addDiscount(code, percent);
+            }
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -167,6 +178,15 @@ public class MarketManager {
         for (Commodity commodity : commodities) {
             if (commodity.getId() == id) {
                 return commodity;
+            }
+        }
+        return null;
+    }
+
+    private Discount findDiscountByCode(String code) {
+        for (Discount discount : discounts) {
+            if (discount.getCode().equals(code)) {
+                return discount;
             }
         }
         return null;
@@ -353,11 +373,44 @@ public class MarketManager {
         return Collections.unmodifiableList(commodityArrayList);
     }
 
+    public boolean purchase(String username, String discountCode) throws RuntimeException {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        Discount discount = findDiscountByCode(discountCode);
+        if (discount == null) {
+            throw new RuntimeException("Discount not found");
+        }
+        if (!discount.canUse(username)) {
+            throw new RuntimeException("Discount can't be used");
+        }
+
+        List<Commodity> buyList = getBuyList(username);
+        int totalPrice = 0;
+        for (Commodity commodity : buyList) {
+            totalPrice += commodity.getPrice();
+        }
+        totalPrice -= totalPrice * discount.getPercent() / 100;
+        for (Commodity commodity : buyList) {
+            if (commodity.getInStock() <= 0) {
+                throw new RuntimeException("Out of stoke");
+            }
+        }
+        user.purchase(totalPrice);
+        for (Commodity commodity : buyList) {
+            commodity.buy();
+        }
+        discount.use(username);
+        return true;
+    }
+
     public boolean purchase(String username) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
+
         List<Commodity> buyList = getBuyList(username);
         int totalPrice = 0;
         for (Commodity commodity : buyList) {
@@ -367,9 +420,11 @@ public class MarketManager {
             if (commodity.getInStock() <= 0) {
                 throw new RuntimeException("Out of stoke");
             }
-            commodity.buy();
         }
         user.purchase(totalPrice);
+        for (Commodity commodity : buyList) {
+            commodity.buy();
+        }
         return true;
     }
 
@@ -443,5 +498,36 @@ public class MarketManager {
             throw new RuntimeException("Invalid vote");
         }
         return true;
+    }
+
+    public boolean addDiscount(String code, int percent) throws RuntimeException {
+        if (percent < 0 || percent > 100) {
+            throw new RuntimeException("Invalid discount percent");
+        }
+        discounts.add(new Discount(code, percent));
+        return true;
+    }
+
+    public boolean canUserUseDiscount(String username, String discountCode) throws RuntimeException {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        Discount discount = findDiscountByCode(discountCode);
+        if (discount == null) {
+            throw new RuntimeException("Discount not found");
+        }
+        if (!discount.canUse(username)) {
+            throw new RuntimeException("User can't use this discount");
+        }
+        return true;
+    }
+
+    public int getDiscountPercent(String discountCode) throws RuntimeException {
+        Discount discount = findDiscountByCode(discountCode);
+        if (discount == null) {
+            throw new RuntimeException("Discount not found");
+        }
+        return discount.getPercent();
     }
 }

@@ -57,7 +57,10 @@ public class Commodity {
         return rating;
     }
 
-    public void buy() {
+    public void buy() throws RuntimeException {
+        if (inStock == 0) {
+            throw new RuntimeException("Not enough in stock");
+        }
         inStock--;
     }
 

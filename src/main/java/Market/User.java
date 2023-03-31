@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-class User {
+public class User {
     private final String username;
     private String password;
     private String email;
