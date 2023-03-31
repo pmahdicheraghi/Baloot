@@ -1,6 +1,7 @@
 <%@ page import="Market.MarketManager" %>
 <%@ page import="Market.Commodity" %>
 <%@ page import="Market.Comment" %>
+<%@ page import="java.util.List" %>
 <%@ page language="java" contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,46 +98,22 @@
         <th>In Stock</th>
         <th>Links</th>
     </tr>
-    <tr>
-        <td>2341</td>
-        <td>Galaxy S22</td>
-        <td>Phone Provider No.1</td>
-        <td>34000000</td>
-        <td>Technology, Phone</td>
-        <td>8.3</td>
-        <td>17</td>
-        <td><a href="/commodities/2341">Link</a></td>
-    </tr>
-    <tr>
-        <td>4231</td>
-        <td>Galaxy S22 Plus</td>
-        <td>Phone Provider No.1</td>
-        <td>43000000</td>
-        <td>Technology, Phone</td>
-        <td>8.7</td>
-        <td>12</td>
-        <td><a href="/commodities/4231">Link</a></td>
-    </tr>
-    <tr>
-        <td>1234</td>
-        <td>Galaxy S22 Ultra</td>
-        <td>Phone Provider No.2</td>
-        <td>50000000</td>
-        <td>Technology, Phone</td>
-        <td>8.9</td>
-        <td>5</td>
-        <td><a href="/commodities/1234">Link</a></td>
-    </tr>
-    <tr>
-        <td>4321</td>
-        <td>Galaxy A53</td>
-        <td>Phone Provider No.2</td>
-        <td>16000000</td>
-        <td>Technology, Phone</td>
-        <td>8.7</td>
-        <td>11</td>
-        <td><a href="/commodities/4321">Link</a></td>
-    </tr>
+    <%
+        StringBuilder suggestedCommoditiesInfo = new StringBuilder();
+        for (Commodity suggestedCommodity : MarketManager.getInstance().getSuggestedCommodities(commodity)) {
+                suggestedCommoditiesInfo.append("<tr>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getId()).append("</td>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getName()).append("</td>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getProviderId()).append("</td>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getPrice()).append("</td>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getCategories()).append("</td>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getRating()).append("</td>");
+                suggestedCommoditiesInfo.append("<td>").append(suggestedCommodity.getInStock()).append("</td>");
+                suggestedCommoditiesInfo.append("<td><a href=\"/commodities/").append(suggestedCommodity.getId()).append("\">Link</a></td>");
+                suggestedCommoditiesInfo.append("</tr>");
+            }
+    %>
+    <%= suggestedCommoditiesInfo.toString()%>
 </table>
 </body>
 </html>

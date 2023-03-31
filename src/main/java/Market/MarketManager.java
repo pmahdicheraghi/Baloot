@@ -372,7 +372,37 @@ public class MarketManager {
         }
         return Collections.unmodifiableList(commodityArrayList);
     }
-
+    public List<Commodity> getSuggestedCommodities(Commodity criterionCommodity)throws RuntimeException{
+        List<Commodity> suggestedCommodities = new ArrayList<Commodity>();
+        List<Integer> scores = new ArrayList<Integer>();
+        boolean addCondtion=true;
+        for (Commodity com : commodities){
+            if(com.getId()==criterionCommodity.getId())continue;
+            boolean isInSimilarCategory = haveCommonCategory(com,criterionCommodity);
+            int score = 11 * (isInSimilarCategory ? 1 : 0) + (int) com.getRating();
+            for (int i=0 ; i<scores.size();i++){
+                if (score >= scores.get(i)) {
+                    scores.add(i, score);
+                    suggestedCommodities.add(i,com);
+                    addCondtion=false;
+                    break;
+                }
+            }
+            if(addCondtion) {
+                scores.add(score);
+                suggestedCommodities.add(com);
+            }
+        }
+        return suggestedCommodities;
+    }
+    public static boolean haveCommonCategory(Commodity commodity1, Commodity commodity2) {
+        for (Category category : commodity1.getCategories()) {
+            if (commodity2.getCategories().contains(category)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean purchase(String username, String discountCode) throws RuntimeException {
         User user = findUserByUsername(username);
         if (user == null) {
@@ -530,4 +560,6 @@ public class MarketManager {
         }
         return discount.getPercent();
     }
+
+
 }
