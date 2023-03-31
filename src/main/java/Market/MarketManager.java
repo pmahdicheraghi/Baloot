@@ -14,7 +14,45 @@ public class MarketManager {
     private final ArrayList<Comment> comments = new ArrayList<>();
     private static MarketManager marketManagerInstance = null;
 
+    private String loggedInUser = "";
+
     private MarketManager() {
+
+    }
+
+    public boolean isUserLoggedIn() {
+        return !loggedInUser.equals("");
+    }
+
+    public String getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    public boolean login(String username, String password) throws RuntimeException {
+        User user = findUserByUsername(username);
+        if (user == null || !user.getPassword().equals(password)) {
+            throw new RuntimeException("Invalid username or password");
+        } else {
+            loggedInUser = username;
+            return true;
+        }
+    }
+
+    public boolean logout() {
+        if (loggedInUser.equals("")) {
+            throw new RuntimeException("No user is logged in");
+        }
+        loggedInUser = "";
+        return true;
+    }
+
+    public void clear() {
+        users.clear();
+        providers.clear();
+        commodities.clear();
+        ratings.clear();
+        comments.clear();
+        loggedInUser = "";
     }
 
     public void init() {
