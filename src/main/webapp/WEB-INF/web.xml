@@ -43,6 +43,14 @@
         <servlet-name>CommodityServlet</servlet-name>
         <url-pattern>/commodities/*</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>CreditServlet</servlet-name>
+        <servlet-class>Market.Controller.CreditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreditServlet</servlet-name>
+        <url-pattern>/credit</url-pattern>
+    </servlet-mapping>
 
 
     <error-page>

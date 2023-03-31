@@ -378,6 +378,9 @@ public class MarketManager {
         if (user == null) {
             throw new RuntimeException("User not found");
         }
+        if (credit <= 0) {
+            throw new RuntimeException("Invalid credit");
+        }
         user.addCredit(credit);
         return true;
     }
