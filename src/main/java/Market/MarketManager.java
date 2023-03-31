@@ -301,6 +301,22 @@ public class MarketManager {
         return temp;
     }
 
+    public List<Commodity> getCommoditiesByName(String name) {
+        List<Commodity> temp = new ArrayList<>();
+        for (Commodity commodity : commodities) {
+            if (commodity.getName().contains(name)) {
+                temp.add(commodity);
+            }
+        }
+        return temp;
+    }
+
+    public List<Commodity> getCommoditiesSortedByRate() {
+        List<Commodity> temp = new ArrayList<>(commodities);
+        temp.sort(Comparator.comparing(Commodity::getRating));
+        return temp;
+    }
+
     public List<Commodity> getCommoditiesWithinPrice(int startPrice, int endPrice) {
         List<Commodity> temp = new ArrayList<>();
         for (Commodity commodity : commodities) {
@@ -376,6 +392,19 @@ public class MarketManager {
             throw new RuntimeException("Commodity not found");
         }
         comments.add(new Comment(id, username, commodityId, comment, date));
+        return true;
+    }
+
+    public boolean addComment(String username, int commodityId, String comment) throws RuntimeException {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        Commodity commodity = findCommodityById(commodityId);
+        if (commodity == null) {
+            throw new RuntimeException("Commodity not found");
+        }
+        comments.add(new Comment(comments.size() + 1, username, commodityId, comment, new Date()));
         return true;
     }
 

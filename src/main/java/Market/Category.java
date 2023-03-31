@@ -8,6 +8,7 @@ public enum Category {
     Technology("Technology"),
     Phone("Phone"),
     PhoneAccessory("Phone Accessory"),
+    Fruits("Fruits"),
     Unknown("Unknown");
 
     private final String val;

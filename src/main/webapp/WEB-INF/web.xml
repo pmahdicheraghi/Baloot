@@ -35,6 +35,14 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>CommodityServlet</servlet-name>
+        <servlet-class>Market.Controller.CommodityServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CommodityServlet</servlet-name>
+        <url-pattern>/commodities/*</url-pattern>
+    </servlet-mapping>
 
 
     <error-page>
