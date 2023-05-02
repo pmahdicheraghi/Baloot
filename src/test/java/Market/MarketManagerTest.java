@@ -54,9 +54,9 @@ public class MarketManagerTest {
         MarketManager mm = MarketManager.getInstance();
         try {
             mm.addProvider(3, "mahdi", new Date());
-            boolean r1 = mm.addCommodity(1, "shampoo", 3, 100, new ArrayList<>(), 8.2f, 10);
+            boolean r1 = mm.addCommodity(1, "shampoo", 3, 100, new ArrayList<>(), 8.2f, 10,"https://test.com");
             assertTrue(r1);
-            boolean r2 = mm.addCommodity(1, "bag", 4, 200, new ArrayList<>(), 8.3f, 20);
+            boolean r2 = mm.addCommodity(1, "bag", 4, 200, new ArrayList<>(), 8.3f, 20,"https://test.com");
             assertFalse(r2);
         } catch (RuntimeException e) {
             assertTrue(true);
@@ -68,7 +68,7 @@ public class MarketManagerTest {
         MarketManager mm = MarketManager.getInstance();
         try {
             mm.addProvider(4, "mahdi", new Date());
-            mm.addCommodity(2, "mobile", 4, 150, new ArrayList<>(), 5.2f, 2);
+            mm.addCommodity(2, "mobile", 4, 150, new ArrayList<>(), 5.2f, 2,"https://test.com");
             assertFalse(mm.getCommoditiesList().isEmpty());
         } catch (RuntimeException e) {
             fail();
@@ -81,7 +81,7 @@ public class MarketManagerTest {
         try {
             mm.addUser("mohsen", "x", "pmch@gmail.com", new Date(), "x", 2);
             mm.addProvider(5, "mm", new Date());
-            mm.addCommodity(3, "dd", 5, 120, new ArrayList<>(), 2.2f, 4);
+            mm.addCommodity(3, "dd", 5, 120, new ArrayList<>(), 2.2f, 4,"https://test.com");
             mm.rateCommodity("mohsen", 5, 4);
             assertEquals(4f, mm.getCommodityById(3).getRating());
             boolean r1 = mm.rateCommodity("mohsen", 3, 12);
@@ -104,7 +104,7 @@ public class MarketManagerTest {
         try {
             mm.addUser("hesam", "x", "pmch@gmail.com", new Date(), "x", 2);
             mm.addProvider(6, "mm", new Date());
-            mm.addCommodity(4, "dd", 6, 120, new ArrayList<>(), 2.2f, 4);
+            mm.addCommodity(4, "dd", 6, 120, new ArrayList<>(), 2.2f, 4,"https://test.com");
             boolean r1 = mm.addToBuyList("hesam", 4);
             assertTrue(r1);
             boolean r2 = mm.removeFromBuyList("hesam", 4);
@@ -129,7 +129,7 @@ public class MarketManagerTest {
         try {
             mm.addUser("gholam", "xyz", "pmch@gmail.com", new Date(), "xyz", 2);
             mm.addProvider(7, "mm", new Date());
-            mm.addCommodity(5, "C5", 7, 120, new ArrayList<>(Arrays.asList(Category.Technology, Category.Vegetables)), 2.2f, 4);
+            mm.addCommodity(5, "C5", 7, 120, new ArrayList<>(Arrays.asList(Category.Technology, Category.Vegetables)), 2.2f, 4,"https://test.com");
             Commodity c5 = mm.getCommodityById(5);
             assertEquals("C5", c5.getName());
             List<Commodity> cs = mm.getCommoditiesByCategory(Category.Vegetables);
@@ -145,7 +145,7 @@ public class MarketManagerTest {
         try {
             mm.addUser("taqi", "xyz", "pmch@gmail.com", new Date(), "xyz", 2);
             mm.addProvider(8, "eit", new Date());
-            mm.addCommodity(6, "C6", 8, 120, new ArrayList<>(), 2.3f, 45);
+            mm.addCommodity(6, "C6", 8, 120, new ArrayList<>(), 2.3f, 45,"https://test.com");
             mm.addComment(1, "taqi", 6, "good", new Date());
             mm.vote("taqi", 1, 1);
             assertEquals(1, mm.getCommentById(1).getLikes());
@@ -167,8 +167,8 @@ public class MarketManagerTest {
         MarketManager mm = MarketManager.getInstance();
         try {
             mm.addProvider(9, "MarkoPolo", new Date());
-            mm.addCommodity(7, "Iphone14", 9, 2000, new ArrayList<>(Arrays.asList(Category.Technology)), 7, 10);
-            mm.addCommodity(8, "Iphone13", 9, 1500, new ArrayList<>(Arrays.asList(Category.Technology)), 6, 7);
+            mm.addCommodity(7, "Iphone14", 9, 2000, new ArrayList<>(Arrays.asList(Category.Technology)), 7, 10,"https://test.com");
+            mm.addCommodity(8, "Iphone13", 9, 1500, new ArrayList<>(Arrays.asList(Category.Technology)), 6, 7,"https://test.com");
             assertEquals(2, mm.getCommoditiesWithinPrice(1500, 2000).size());
             assertEquals(0, mm.getCommoditiesWithinPrice(1000, 500).size());
             assertEquals(0, mm.getCommoditiesWithinPrice(1200, 1300).size());
@@ -183,8 +183,8 @@ public class MarketManagerTest {
         try {
             mm.addUser("alikhafan", "1234", "alikhafan@gmail.com", new Date(), "nezamabad", 2000);
             mm.addProvider(10, "MarkoPolo", new Date());
-            mm.addCommodity(9, "Iphone14", 10, 10, new ArrayList<>(Arrays.asList(Category.Technology)), 7, 10);
-            mm.addCommodity(10, "Iphone13", 10, 20, new ArrayList<>(Arrays.asList(Category.Technology)), 6, 0);
+            mm.addCommodity(9, "Iphone14", 10, 10, new ArrayList<>(Arrays.asList(Category.Technology)), 7, 10,"https://test.com");
+            mm.addCommodity(10, "Iphone13", 10, 20, new ArrayList<>(Arrays.asList(Category.Technology)), 6, 0,"https://test.com");
             mm.addToBuyList("alikhafan", 9);
             assertEquals(mm.getBuyList("alikhafan").size(), 1);
         } catch (RuntimeException e) {

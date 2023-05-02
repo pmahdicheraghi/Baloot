@@ -93,7 +93,8 @@ public class MarketManager {
                 ArrayList<Category> categories = JsonParser.parseCategory((JSONArray) jsonObject.get("categories"));
                 float rating = (float) (double) jsonObject.get("rating");
                 int inStock = (int) (long) jsonObject.get("inStock");
-                addCommodity(id, name, providerId, price, categories, rating, inStock);
+                String imageUrl = (String) jsonObject.get("image");
+                addCommodity(id, name, providerId, price, categories, rating, inStock,imageUrl);
             }
 
             String commentsJson = HttpRequest.getHttpResponse("http://5.253.25.110:5000/api/comments");
@@ -217,7 +218,7 @@ public class MarketManager {
         return true;
     }
 
-    public boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) throws RuntimeException {
+    public boolean addCommodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock,String imageUrl) throws RuntimeException {
         Provider provider = findProviderById(providerId);
         if (provider == null) {
             throw new RuntimeException("Provider id not found");
@@ -226,7 +227,7 @@ public class MarketManager {
         if (commodity != null) {
             throw new RuntimeException("This id is already registered");
         }
-        commodities.add(new Commodity(id, name, providerId, price, categories, rating, inStock));
+        commodities.add(new Commodity(id, name, providerId, price, categories, rating, inStock, imageUrl));
         return true;
     }
 

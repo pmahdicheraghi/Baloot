@@ -15,7 +15,8 @@ public class Commodity {
     private int inStock;
     private final ArrayList<Category> categories;
 
-    public Commodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock) {
+    private final String imageUrl;
+    public Commodity(int id, String name, int providerId, int price, ArrayList<Category> categories, float rating, int inStock,String imageUrl) {
         this.id = id;
         this.name = name;
         this.providerId = providerId;
@@ -23,6 +24,7 @@ public class Commodity {
         this.rating = rating;
         this.inStock = inStock;
         this.categories = categories;
+        this.imageUrl = imageUrl;
     }
 
     public int getId() {

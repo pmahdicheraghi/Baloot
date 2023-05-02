@@ -58,7 +58,8 @@ public class CommandLine {
                         ArrayList<Category> categories = JsonParser.parseCategory((String) params.get("categories"));
                         float rating = (float) (double) params.get("rating");
                         int inStock = (int) (long) params.get("inStock");
-                        market.addCommodity(id, name, providerId, price, categories, rating, inStock);
+                        String imageUrl = (String) params.get("image");
+                        market.addCommodity(id, name, providerId, price, categories, rating, inStock, imageUrl);
                         System.out.println(toResultJson(true, "Commodity added successfully"));
                         break;
                     }
